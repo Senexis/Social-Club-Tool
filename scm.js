@@ -208,7 +208,6 @@ function Init() {
 			type: "warning",
 			showCancelButton: true,
 			cancelButtonText: "No",
-			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "Yes",
 			closeOnConfirm: false
 		},
