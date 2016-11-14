@@ -1,7 +1,4 @@
 function Init() {
-	var children = [];
-	var requestToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
-
 	var jq = document.createElement('script');
 	jq.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js";
 	document.getElementsByTagName('head')[0].appendChild(jq);
@@ -16,6 +13,9 @@ function Init() {
 	document.getElementsByTagName('head')[0].appendChild(sa);
 
 	if (window.location.href.startsWith("https://socialclub.rockstargames.com/friends")) {
+		var children = [];
+		var requestToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
+		
 		setTimeout(function () {
 			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllScript" style="margin-bottom: 8px;">delete all friends</a>').prependTo('#friendsPage');
 			$("#btnConfirmDeleteAllScript").click(function(e) {
