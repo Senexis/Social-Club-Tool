@@ -15,7 +15,7 @@ function Init() {
 	sa.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
 	document.getElementsByTagName('head')[0].appendChild(sa);
 
-	if (window.location.href === "https://socialclub.rockstargames.com/friends/index") {
+	if (window.location.href.startsWith("https://socialclub.rockstargames.com/friends")) {
 		setTimeout(function () {
 			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllScript" style="margin-bottom: 8px;">delete all friends</a>').prependTo('#friendsPage');
 			$("#btnConfirmDeleteAllScript").click(function(e) {
@@ -200,15 +200,16 @@ function Init() {
 	} else {
 		swal({
 			title: "Wrong site",
-			text: "Whoops, you accidentally activated the script on a wrong web page. To use the script, first browse to https://socialclub.rockstargames.com/friends/index.\n\nDo you want to go there now?",
+			text: "Whoops, you accidentally activated the script on a wrong web page. To use the script, first browse to the correct page, then click the bookmark again.\n\nDo you want to go there now?",
 			type: "warning",
 			showCancelButton: true,
+			cancelButtonText: "No",
 			confirmButtonColor: "#DD6B55",
-			confirmButtonText: "Yes, delete it!",
+			confirmButtonText: "Yes",
 			closeOnConfirm: false
 		},
 		function(){
-			swal("Deleted!", "Your imaginary file has been deleted.", "success");
+			window.location.href = "https://socialclub.rockstargames.com/friends/index";
 		});
 	}
 }
