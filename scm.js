@@ -204,7 +204,7 @@ function Init() {
 	} else {
 		swal({
 			title: "Wrong site",
-			text: "Whoops, you accidentally activated the script on a wrong web page. To use the script, first browse to the correct page, then click the bookmark again.\n\nDo you want to go there now?",
+			text: "Whoops, you accidentally activated the script on a wrong web page. To use the script, first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club friends page now?",
 			type: "warning",
 			showCancelButton: true,
 			cancelButtonText: "No",
