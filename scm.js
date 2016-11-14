@@ -203,13 +203,14 @@ function Init() {
 		}
 	} else {
 		swal({
-			title: "Wrong site",
-			text: "Whoops, you accidentally activated the script on a wrong web page. To use the script, first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club friends page now?",
-			type: "warning",
-			showCancelButton: true,
+			allowOutsideClick: true,
 			cancelButtonText: "No",
+			closeOnConfirm: false,
 			confirmButtonText: "Yes",
-			closeOnConfirm: false
+			showCancelButton: true,
+			text: "Whoops, you accidentally activated the script on a wrong web page. To use the script, first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club friends page now?",
+			title: "Wrong site",
+			type: "warning"
 		},
 		function(){
 			window.location.href = "https://socialclub.rockstargames.com/friends/index";
