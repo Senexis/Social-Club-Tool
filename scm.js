@@ -240,7 +240,7 @@ function Init(debug = false) {
 						});
 					};
 
-					swal("Started removing "+responseData.TotalCount+" friends", "All of your friends are now being removed.\nSee which friends are removed using F12.", "success");
+					if (responseData.TotalCount > 0) swal("Started removing "+responseData.TotalCount+" friends", "All of your friends are now being removed.\nSee which friends are removed using F12.", "success");
 				} catch (err) {
 					console.error("Error during Loop():\n\n"+err.stack);
 					return;
