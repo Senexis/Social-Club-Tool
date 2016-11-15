@@ -134,6 +134,11 @@ function Init(debug = false, dryrun = false) {
 							return false
 						}
 
+						if (inputValue.trim().toLowerCase() === siteMaster.authUserNickName.toLowerCase()) {
+							swal.showInputError("You can't add yourself as a friend.");
+							return false
+						}
+
 						$.ajax({
 							url: "https://socialclub.rockstargames.com/Friends/GetAccountDetails?nickname="+inputValue.trim()+"&full=false",
 							headers: {
