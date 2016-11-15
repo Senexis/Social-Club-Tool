@@ -1,4 +1,4 @@
-function Init(debug = false) {
+function Init(debug = false, dryrun = false) {
 	var jq = document.createElement('script');
 	jq.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js";
 	document.getElementsByTagName('head')[0].appendChild(jq);
@@ -252,12 +252,7 @@ function Init(debug = false) {
 							Delete(array.pop());
 							Loop(array);
 						} else {
-							swal({
-								text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
-								timer: 10000,
-								title: "Friends removed",
-								type: "success"
-							});
+							swal("Friends removed", "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.", "success");
 						}
 					}, 1000)
 				} catch (err) {
@@ -268,7 +263,7 @@ function Init(debug = false) {
 
 			function Add(rockstarObj, inputValue){
 				try {
-					if (debug) return;
+					if (dryrun) return;
 
 					if (rockstarObj.Status == true) {
 						$.ajax({
@@ -314,12 +309,7 @@ function Init(debug = false) {
 								};
 
 								if (data.Status == true) {
-									swal({
-										text: 'A friend request has been sent to "' + rockstarObj.Nickname + '".\n\nTo view the changes to your friends list, please refresh the page.',
-										timer: 10000,
-										title: "User added",
-										type: "success"
-									});
+									swal("User added", 'A friend request has been sent to "' + rockstarObj.Nickname + '".\n\nTo view the changes to your friends list, please refresh the page.', "success");
 								} else {
 									swal("Something went wrong", 'Something went wrong trying to add "' + rockstarObj.Nickname + '".', "error");
 								}
@@ -348,7 +338,7 @@ function Init(debug = false) {
 
 			function Delete(rockstarObj) {
 				try {
-					if (debug) return;
+					if (dryrun) return;
 
 					if (rockstarObj.Relationship.toLowerCase() === "friend") {
 						$.ajax({
