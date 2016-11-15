@@ -27,12 +27,13 @@ function Init(debug = false) {
 
 				try {
 					swal({
-						allowOutsideClick: true,
+						allowEscapeKey: false,
 						cancelButtonText: "No",
 						closeOnConfirm: false,
 						confirmButtonColor: "#DD6B55",
 						confirmButtonText: "Yes",
 						showCancelButton: true,
+						showLoaderOnConfirm: true,
 						text: "All friends will be removed from your friend list.",
 						title: "Are you sure?",
 						type: "warning",
@@ -78,7 +79,7 @@ function Init(debug = false) {
 									} 
 
 									if (data.Status == true) {
-										Loop(data);
+										RetrieveAll(data);
 									} else {
 										swal("Something went wrong", "Something went wrong while trying to fetch initial data.", "error");
 									}
@@ -100,11 +101,12 @@ function Init(debug = false) {
 
 				try {
 					swal({
-						allowOutsideClick: true,
+						allowEscapeKey: false,
 						closeOnConfirm: false,
 						confirmButtonText: "Add",
 						inputPlaceholder: "Social Club username",
 						showCancelButton: true,
+						showLoaderOnConfirm: true,
 						text: 'Please enter the Social Club username you want to add. When you click "Add", the username will automatically be added if it exists.',
 						title: "Enter username",
 						type: "input",
@@ -180,11 +182,11 @@ function Init(debug = false) {
 				}
 			});
 
-			function Loop(responseData){
+			function RetrieveAll(responseData){
 				try {
 					var children = [];
 
-					for (var i = 0; i <= responseData.TotalCount / 12; i++) {
+					for (var i = 0; i <= Math.ceil(responseData.TotalCount / 12); i++) {
 						$.ajax({
 							url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber="+i+"&onlineService=sc&nickname=&pendingInvitesOnly=false",
 							headers: {
@@ -226,21 +228,38 @@ function Init(debug = false) {
 								if (data.Status == true) {
 									data.RockstarAccounts.forEach(function(e){
 										children.push(e);
-									})
-
-									children.forEach(function(e){
-										setTimeout(function () {
-											Delete(e);
-										}, 1000);
 									});
+
+									if (children.length == responseData.TotalCount){
+										Loop(children);
+									};
 								} else {
 									swal("Something went wrong", "Something went wrong while trying to fetch data from page "+i+".", "error");
 								}
 							}
 						});
 					};
+				} catch (err) {
+					console.error("Error during RetrieveAll():\n\n"+err.stack);
+					return;
+				}
+			}
 
-					if (responseData.TotalCount > 0) swal("Started removing "+responseData.TotalCount+" friends", "All of your friends are now being removed.\nSee which friends are removed using F12.", "success");
+			function Loop(array) {
+				try {
+					setTimeout(function() {
+						if (array.length > 0) {
+							Delete(array.pop());
+							Loop(array);
+						} else {
+							swal({
+								text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+								timer: 10000,
+								title: "Friends removed",
+								type: "success"
+							});
+						}
+					}, 1000)
 				} catch (err) {
 					console.error("Error during Loop():\n\n"+err.stack);
 					return;
@@ -249,6 +268,8 @@ function Init(debug = false) {
 
 			function Add(rockstarObj, inputValue){
 				try {
+					if (debug) return;
+
 					if (rockstarObj.Status == true) {
 						$.ajax({
 							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
@@ -293,7 +314,12 @@ function Init(debug = false) {
 								};
 
 								if (data.Status == true) {
-									swal("User added", 'A friend request has been sent to "' + rockstarObj.Nickname + '".', "success");
+									swal({
+										text: 'A friend request has been sent to "' + rockstarObj.Nickname + '".\n\nTo view the changes to your friends list, please refresh the page.',
+										timer: 10000,
+										title: "User added",
+										type: "success"
+									});
 								} else {
 									swal("Something went wrong", 'Something went wrong trying to add "' + rockstarObj.Nickname + '".', "error");
 								}
@@ -322,6 +348,8 @@ function Init(debug = false) {
 
 			function Delete(rockstarObj) {
 				try {
+					if (debug) return;
+
 					if (rockstarObj.Relationship.toLowerCase() === "friend") {
 						$.ajax({
 							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
