@@ -21,8 +21,154 @@ function Init(debug = false, dryrun = false) {
 				return;
 			}
 
-			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllScript" style="margin-bottom: 8px;">delete all friends</a>').prependTo('#friendsPage');
-			$("#btnConfirmDeleteAllScript").click(function(e) {
+			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllMessagesScript" style="margin-bottom: 8px;">delete all messages</a>').prependTo('#friendsPage');
+			$("#btnConfirmDeleteAllMessagesScript").click(function(e) {
+				e.preventDefault();
+
+				try {
+					swal({
+						allowEscapeKey: false,
+						cancelButtonText: "No",
+						closeOnConfirm: false,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "Yes",
+						showCancelButton: true,
+						showLoaderOnConfirm: true,
+						text: "All messages will be deleted from your inbox.",
+						title: "Are you sure?",
+						type: "warning",
+					},
+					function(isConfirm){
+						if (isConfirm) {
+							$.ajax({
+								url: "https://socialclub.rockstargames.com/Message/GetMessageCount",
+								headers: {
+									"Accept": "application/json",
+									"RequestVerificationToken": requestToken
+								},
+								error: function(err){
+									if (debug) {
+										console.groupCollapsed("GetMessageCount AJAX FAIL");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(err);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch initial data.", "error");
+								},
+								success: function(data){
+									if (debug) {
+										console.groupCollapsed("GetMessageCount AJAX OK");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(data);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									if (data.Total > 0) {
+										RetrieveAllMessageUsers([]);
+									} else {
+										swal("No messages", "There were no messages to delete.", "success");
+									}
+								}
+							});
+						} else {
+							return;
+						}
+					});
+				} catch (err) {
+					console.error("Error during #btnConfirmDeleteAllMessagesScript.click():\n\n"+err.stack);
+					return;
+				}
+			});
+
+			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmRejectAllFrsScript" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#friendsPage');
+			$("#btnConfirmRejectAllFrsScript").click(function(e) {
+				e.preventDefault();
+
+				try {
+					swal({
+						allowEscapeKey: false,
+						cancelButtonText: "No",
+						closeOnConfirm: false,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "Yes",
+						showCancelButton: true,
+						showLoaderOnConfirm: true,
+						text: "All friend requests you have received will be rejected.",
+						title: "Are you sure?",
+						type: "warning",
+					},
+					function(isConfirm){
+						if (isConfirm) {
+							var children = [];
+
+							$.ajax({
+								url: "https://socialclub.rockstargames.com/friends/GetReceivedInvitesJson",
+								headers: {
+									"Accept": "application/json",
+									"RequestVerificationToken": requestToken
+								},
+								error: function(err){
+									if (debug) {
+										console.groupCollapsed("GetReceivedInvitesJson AJAX FAIL");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(err);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch initial data.", "error");
+								},
+								success: function(data){
+									if (debug) {
+										console.groupCollapsed("GetReceivedInvitesJson AJAX OK");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(data);
+										console.groupEnd();
+										console.groupEnd();
+									} 
+
+									if (data.Status == true && data.TotalCount > 0) {
+										data.RockstarAccounts.forEach(function(e){
+											children.push(e);
+										});
+
+										if (children.length == data.TotalCount){
+											FriendsLoop(children, true);
+										};
+									} else if (data.Status == true && data.TotalCount == 0) {
+										swal("No friend requests", "There were no friend requests to reject.", "success");
+									} else {
+										swal("Something went wrong", "Something went wrong while trying to fetch initial data.", "error");
+									}
+								}
+							});
+						} else {
+							return;
+						}
+					});
+				} catch (err) {
+					console.error("Error during #btnConfirmRejectAllFrsScript.click():\n\n"+err.stack);
+					return;
+				}
+			});
+
+			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllFriendsScript" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#friendsPage');
+			$("#btnConfirmDeleteAllFriendsScript").click(function(e) {
 				e.preventDefault();
 
 				try {
@@ -41,23 +187,20 @@ function Init(debug = false, dryrun = false) {
 					function(isConfirm){
 						if (isConfirm) {
 							$.ajax({
-								url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber=0&onlineService=sc&nickname=&pendingInvitesOnly=false",
+								url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber=0&onlineService=sc&pendingInvitesOnly=false",
 								headers: {
 									"Accept": "application/json",
 									"RequestVerificationToken": requestToken
 								},
 								error: function(err){
 									if (debug) {
-										console.groupCollapsed();
-										console.debug("GetFriendsAndInvitesSentJson AJAX incomplete");
-										console.debug("\tURL:\t"+this.url);
-										console.debug("\tMethod:\t"+this.type);
-										console.debug("");
-										console.debug("Request:");
+										console.groupCollapsed("GetFriendsAndInvitesSentJson AJAX FAIL");
+										console.group("Request");
 										console.debug(this);
-										console.debug("");
-										console.debug("Response:");
+										console.groupEnd();
+										console.group("Response");
 										console.debug(err);
+										console.groupEnd();
 										console.groupEnd();
 									};
 
@@ -65,21 +208,20 @@ function Init(debug = false, dryrun = false) {
 								},
 								success: function(data){
 									if (debug) {
-										console.groupCollapsed();
-										console.debug("GetFriendsAndInvitesSentJson AJAX complete");
-										console.debug("\tURL:\t"+this.url);
-										console.debug("\tMethod:\t"+this.type);
-										console.debug("");
-										console.debug("Request:");
+										console.groupCollapsed("GetFriendsAndInvitesSentJson AJAX OK");
+										console.group("Request");
 										console.debug(this);
-										console.debug("");
-										console.debug("Response:");
+										console.groupEnd();
+										console.group("Response");
 										console.debug(data);
+										console.groupEnd();
 										console.groupEnd();
 									} 
 
-									if (data.Status == true) {
-										RetrieveAll(data);
+									if (data.Status == true && data.TotalCount > 0) {
+										RetrieveAllFriends(data);
+									} else if (data.Status == true && data.TotalCount == 0) {
+										swal("No friends", "There were no friends to delete.", "success");
 									} else {
 										swal("Something went wrong", "Something went wrong while trying to fetch initial data.", "error");
 									}
@@ -90,7 +232,7 @@ function Init(debug = false, dryrun = false) {
 						}
 					});
 				} catch (err) {
-					console.error("Error during #btnConfirmDeleteAllScript.click():\n\n"+err.stack);
+					console.error("Error during #btnConfirmDeleteAllFriendsScript.click():\n\n"+err.stack);
 					return;
 				}
 			});
@@ -147,16 +289,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							error: function(err){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("GetAccountDetails AJAX incomplete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("GetAccountDetails AJAX FAIL");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(err);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -164,20 +303,17 @@ function Init(debug = false, dryrun = false) {
 							},
 							success: function(data){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("GetAccountDetails AJAX complete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("GetAccountDetails AJAX OK");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(data);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
-								Add(data, inputValue);
+								AddFriend(data, inputValue);
 							}
 						});
 					});
@@ -187,29 +323,231 @@ function Init(debug = false, dryrun = false) {
 				}
 			});
 
-			function RetrieveAll(responseData){
+			function RetrieveAllMessageUsers(source, pageIndex = 0) {
 				try {
-					var children = [];
-
-					for (var i = 0; i <= Math.ceil(responseData.TotalCount / 12); i++) {
+					setTimeout(function() {
 						$.ajax({
-							url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber="+i+"&onlineService=sc&nickname=&pendingInvitesOnly=false",
+							url: "https://socialclub.rockstargames.com/Message/GetConversationList?pageIndex="+pageIndex,
 							headers: {
 								"Accept": "application/json",
 								"RequestVerificationToken": requestToken
 							},
 							error: function(err){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("GetFriendsAndInvitesSentJson AJAX incomplete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("GetConversationList AJAX FAIL");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(err);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch conversation data.", "error");
+							},
+							success: function(data){
+								if (debug) {
+									console.groupCollapsed("GetConversationList AJAX OK");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(data);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								data.Users.forEach(function(e){
+									source.push(e);
+								});
+
+								if (data.HasMore === true) {
+									RetrieveAllMessageUsers(source, data.NextPageIndex);
+								} else {
+									if (debug) console.debug("RetrieveAllMessageUsers() complete.");
+
+									RetrieveAllMessages(source);
+								}
+							}
+						});
+					}, 1000)
+				} catch (err) {
+					console.error("Error during RetrieveAllMessageUsers():\n\n"+err.stack);
+					return;
+				}
+			}
+
+			function RetrieveAllMessages(source, target = []) {
+				try {
+					setTimeout(function() {
+						var item = source.pop();
+						if (debug) {
+							console.groupCollapsed("RetrieveAllMessages() POP");
+							console.group("Item");
+							console.debug(item);
+							console.groupEnd();
+							console.groupEnd();
+						};
+
+						$.ajax({
+							url: "https://socialclub.rockstargames.com/Message/GetMessages?rockstarId="+item.RockstarId,
+							headers: {
+								"Accept": "application/json",
+								"RequestVerificationToken": requestToken
+							},
+							error: function(err){
+								if (debug) {
+									console.groupCollapsed("GetMessages AJAX FAIL");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(err);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch messages.", "error");
+							},
+							success: function(data){
+								if (debug) {
+									console.groupCollapsed("GetMessages AJAX OK");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(data);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								target = target.concat(data.Messages);
+
+								if (source.length > 0) {
+									RetrieveAllMessages(source, target);
+								} else if (target.length > 0) {
+									if (debug) console.debug("RetrieveAllMessages() complete.");
+
+									RemoveAllMessages(target);
+								}
+							}
+						});
+					}, 1000)
+				} catch (err) {
+					console.error("Error during RetrieveAllMessages():\n\n"+err.stack);
+					return;
+				}
+			}
+
+			function RemoveAllMessages(source){
+				try {
+					if (dryrun) return;
+
+					setTimeout(function() {
+						var item = source.pop();
+						if (debug) {
+							console.groupCollapsed("RemoveAllMessages() POP");
+							console.group("Item");
+							console.debug(item);
+							console.groupEnd();
+							console.groupEnd();
+						};
+
+						$.ajax({
+							url: "https://socialclub.rockstargames.com/Message/DeleteMessage",
+							type: "POST",
+							data: '{"messageid":'+item.ID+',"isAdmin":'+item.IsAdminMessage+'}',
+							headers: {
+								"Content-Type": "application/json",
+								"RequestVerificationToken": requestToken
+							},
+							error: function(err){
+								if (debug) {
+									console.groupCollapsed("DeleteMessage AJAX FAIL");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(err);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								console.error("The message sent by " + item.ScNickname + " could not be removed. ("+err.status+" - "+err.statusText+")");
+							},
+							success: function(data){
+								if (debug) {
+									console.groupCollapsed("DeleteMessage AJAX OK");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(data);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								if (data.Status == true) {
+									if (item.ScNickname.toLowerCase() === siteMaster.authUserNickName.toLowerCase()) {
+										console.info("A message you sent to someone has been removed.");
+									} else {
+										console.info("A message " + item.ScNickname + " sent to you has been removed.");
+									}
+								} else {
+									if (item.ScNickname.toLowerCase() === siteMaster.authUserNickName.toLowerCase()) {
+										console.info("A message you sent to someone could not be removed.");
+									} else {
+										console.info("A message " + item.ScNickname + " sent to you could not be removed.");
+									}
+								}
+
+								if (source.length > 0) {
+									RemoveAllMessages(source);
+								} else {
+									swal("Messages removed", "All of the messages in your inbox should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.", "success");
+								}
+							},
+							xhr: function() {
+								// No cross-origin header. :-)
+								var xhr = jQuery.ajaxSettings.xhr();
+								var setRequestHeader = xhr.setRequestHeader;
+								
+								xhr.setRequestHeader = function(name, value) {
+									if (name == 'X-Requested-With') return;
+									setRequestHeader.call(this, name, value);
+								}
+
+								return xhr;
+							}
+						});
+					}, 1000)
+				} catch (err) {
+					console.error("Error during RemoveAllMessages():\n\n"+err.stack);
+					return;
+				}
+			}
+
+			function RetrieveAllFriends(responseData){
+				try {
+					var children = [];
+
+					for (var i = 0; i <= Math.ceil(responseData.TotalCount / 12); i++) {
+						$.ajax({
+							url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber="+i+"&onlineService=sc&pendingInvitesOnly=false",
+							headers: {
+								"Accept": "application/json",
+								"RequestVerificationToken": requestToken
+							},
+							error: function(err){
+								if (debug) {
+									console.groupCollapsed("GetFriendsAndInvitesSentJson AJAX FAIL");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(err);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -217,16 +555,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							success: function(data){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("GetFriendsAndInvitesSentJson AJAX complete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("GetFriendsAndInvitesSentJson AJAX OK");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(data);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -236,7 +571,7 @@ function Init(debug = false, dryrun = false) {
 									});
 
 									if (children.length == responseData.TotalCount){
-										Loop(children);
+										FriendsLoop(children, false);
 									};
 								} else {
 									swal("Something went wrong", "Something went wrong while trying to fetch data from page "+i+".", "error");
@@ -245,28 +580,41 @@ function Init(debug = false, dryrun = false) {
 						});
 					};
 				} catch (err) {
-					console.error("Error during RetrieveAll():\n\n"+err.stack);
+					console.error("Error during RetrieveAllFriends():\n\n"+err.stack);
 					return;
 				}
 			}
 
-			function Loop(array) {
+			function FriendsLoop(array, isFriendRequestLoop) {
 				try {
 					setTimeout(function() {
 						if (array.length > 0) {
-							Delete(array.pop());
-							Loop(array);
+							var item = array.pop();
+							if (debug) {
+								console.groupCollapsed("FriendsLoop() POP");
+								console.group("Item");
+								console.debug(item);
+								console.groupEnd();
+								console.groupEnd();
+							};
+
+							RemoveFriend(item);
+							FriendsLoop(array, isFriendRequestLoop);
 						} else {
-							swal("Friends removed", "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.", "success");
+							if (isFriendRequestLoop) {
+								swal("Friend requests rejected", "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.", "success");
+							} else {
+								swal("Friends removed", "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.", "success");
+							}
 						}
 					}, 1000)
 				} catch (err) {
-					console.error("Error during Loop():\n\n"+err.stack);
+					console.error("Error during FriendsLoop():\n\n"+err.stack);
 					return;
 				}
 			}
 
-			function Add(rockstarObj, inputValue){
+			function AddFriend(rockstarObj, inputValue){
 				try {
 					if (dryrun) return;
 
@@ -281,17 +629,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							error: function(err){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("UpdateFriend AJAX incomplete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("\tData:\t"+this.data);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("UpdateFriend AJAX FAIL");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(err);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -299,17 +643,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							success: function(data){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("UpdateFriend AJAX complete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("\tData:\t"+this.data);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("UpdateFriend AJAX OK");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(data);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -336,16 +676,16 @@ function Init(debug = false, dryrun = false) {
 						swal("User not found", 'The nickname "'+inputValue+'" doesn\'t exist.', "warning");
 					}
 				} catch (err) {
-					console.error("Error during Add():\n\n"+err.stack);
+					console.error("Error during AddFriend():\n\n"+err.stack);
 					return;
 				}
 			}
 
-			function Delete(rockstarObj) {
+			function RemoveFriend(rockstarObj) {
 				try {
 					if (dryrun) return;
 
-					if (rockstarObj.Relationship.toLowerCase() === "friend") {
+					if (rockstarObj.AllowDelete === true) {
 						$.ajax({
 							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
 							type: "PUT",
@@ -356,17 +696,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							error: function(err){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("UpdateFriend AJAX incomplete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("\tData:\t"+this.data);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("UpdateFriend AJAX FAIL");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(err);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -374,17 +710,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							success: function(data){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("UpdateFriend AJAX complete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("\tData:\t"+this.data);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("UpdateFriend AJAX OK");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(data);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -407,7 +739,7 @@ function Init(debug = false, dryrun = false) {
 								return xhr;
 							}
 						});
-					} else if (rockstarObj.Relationship.toLowerCase() === "invitedbyme") {
+					} else if (rockstarObj.AllowCancel === true) {
 						$.ajax({
 							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
 							type: "PUT",
@@ -418,17 +750,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							error: function(err){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("UpdateFriend AJAX incomplete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("\tData:\t"+this.data);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("UpdateFriend AJAX FAIL");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(err);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -436,17 +764,13 @@ function Init(debug = false, dryrun = false) {
 							},
 							success: function(data){
 								if (debug) {
-									console.groupCollapsed();
-									console.debug("UpdateFriend AJAX complete");
-									console.debug("\tURL:\t"+this.url);
-									console.debug("\tMethod:\t"+this.type);
-									console.debug("\tData:\t"+this.data);
-									console.debug("");
-									console.debug("Request:");
+									console.groupCollapsed("UpdateFriend AJAX OK");
+									console.group("Request");
 									console.debug(this);
-									console.debug("");
-									console.debug("Response:");
+									console.groupEnd();
+									console.group("Response");
 									console.debug(data);
+									console.groupEnd();
 									console.groupEnd();
 								};
 
@@ -469,11 +793,65 @@ function Init(debug = false, dryrun = false) {
 								return xhr;
 							}
 						});
+					} else if (rockstarObj.AllowAdd === true) {
+						$.ajax({
+							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+							type: "PUT",
+							data: '{"id":'+rockstarObj.RockstarId+',"op":"ignore"}',
+							headers: {
+								"Content-Type": "application/json",
+								"RequestVerificationToken": requestToken
+							},
+							error: function(err){
+								if (debug) {
+									console.groupCollapsed("UpdateFriend AJAX FAIL");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(err);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								console.error("The friend request you received from " + rockstarObj.Name + " could not be rejected. ("+err.status+" - "+err.statusText+")");
+							},
+							success: function(data){
+								if (debug) {
+									console.groupCollapsed("UpdateFriend AJAX OK");
+									console.group("Request");
+									console.debug(this);
+									console.groupEnd();
+									console.group("Response");
+									console.debug(data);
+									console.groupEnd();
+									console.groupEnd();
+								};
+
+								if (data.Status == true) {
+									console.info("The friend request you received from " + rockstarObj.Name + " has been rejected.");
+								} else {
+									console.error("The friend request you received from " + rockstarObj.Name + " could not be rejected.");
+								}
+							},
+							xhr: function() {
+								// No cross-origin header. :-)
+								var xhr = jQuery.ajaxSettings.xhr();
+								var setRequestHeader = xhr.setRequestHeader;
+								
+								xhr.setRequestHeader = function(name, value) {
+									if (name == 'X-Requested-With') return;
+									setRequestHeader.call(this, name, value);
+								}
+
+								return xhr;
+							}
+						});
 					} else {
 						console.warn("The user " + rockstarObj.Name + " has been skipped (reason: type \""+rockstarObj.Relationship+"\" not supported).");
 					}
 				} catch (err) {
-					console.error("Error during Delete():\n\n"+err.stack);
+					console.error("Error during RemoveFriend():\n\n"+err.stack);
 					return;
 				}
 			}
