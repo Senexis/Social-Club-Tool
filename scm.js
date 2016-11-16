@@ -13,7 +13,7 @@ function Init(debug = false, dryrun = false) {
 	document.getElementsByTagName('head')[0].appendChild(sa);
 
 	setTimeout(function () {
-		if (window.location.href.startsWith("https://socialclub.rockstargames.com/friends")) {
+		if (window.location.href.startsWith("https://socialclub.rockstargames.com/")) {
 			try {
 				var requestToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
 			} catch (err) {
@@ -21,7 +21,7 @@ function Init(debug = false, dryrun = false) {
 				return;
 			}
 
-			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllMessagesScript" style="margin-bottom: 8px;">delete all messages</a>').prependTo('#friendsPage');
+			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllMessagesScript" style="margin-bottom: 8px;">delete all messages</a>').prependTo('#page');
 			$("#btnConfirmDeleteAllMessagesScript").click(function(e) {
 				e.preventDefault();
 
@@ -58,7 +58,13 @@ function Init(debug = false, dryrun = false) {
 										console.groupEnd();
 									};
 
-									swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch initial data.", "error");
+									swal({
+										allowOutsideClick: true,
+										text: "Something went wrong while trying to fetch initial data.",
+										title: err.status+" - "+err.statusText,
+										timer: 2500,
+										type: "error",
+									});	
 								},
 								success: function(data){
 									if (debug) {
@@ -75,7 +81,13 @@ function Init(debug = false, dryrun = false) {
 									if (data.Total > 0) {
 										RetrieveAllMessageUsers([]);
 									} else {
-										swal("No messages", "There were no messages to delete.", "success");
+										swal({
+											allowOutsideClick: true,
+											text: "There were no messages to delete.",
+											title: "No messages",
+											timer: 2500,
+											type: "success",
+										});	
 									}
 								}
 							});
@@ -89,7 +101,7 @@ function Init(debug = false, dryrun = false) {
 				}
 			});
 
-			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmRejectAllFrsScript" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#friendsPage');
+			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmRejectAllFrsScript" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
 			$("#btnConfirmRejectAllFrsScript").click(function(e) {
 				e.preventDefault();
 
@@ -128,7 +140,13 @@ function Init(debug = false, dryrun = false) {
 										console.groupEnd();
 									};
 
-									swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch initial data.", "error");
+									swal({
+										allowOutsideClick: true,
+										text: "Something went wrong while trying to fetch initial data.",
+										title: err.status+" - "+err.statusText,
+										timer: 2500,
+										type: "error",
+									});
 								},
 								success: function(data){
 									if (debug) {
@@ -143,17 +161,29 @@ function Init(debug = false, dryrun = false) {
 									} 
 
 									if (data.Status == true && data.TotalCount > 0) {
-										data.RockstarAccounts.forEach(function(e){
+										data.RockstarAccounts.forEach(function(e) {
 											children.push(e);
 										});
 
-										if (children.length == data.TotalCount){
-											FriendsLoop(children, true);
+										if (children.length == data.TotalCount) {
+											RetrieveAllFriends(children, true);
 										};
 									} else if (data.Status == true && data.TotalCount == 0) {
-										swal("No friend requests", "There were no friend requests to reject.", "success");
+										swal({
+											allowOutsideClick: true,
+											text: "There were no friend requests to reject.",
+											title: "No friend requests",
+											timer: 2500,
+											type: "success",
+										});
 									} else {
-										swal("Something went wrong", "Something went wrong while trying to fetch initial data.", "error");
+										swal({
+											allowOutsideClick: true,
+											text: "Something went wrong while trying to fetch initial data.",
+											title: "Something went wrong",
+											timer: 2500,
+											type: "error",
+										});
 									}
 								}
 							});
@@ -167,7 +197,7 @@ function Init(debug = false, dryrun = false) {
 				}
 			});
 
-			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllFriendsScript" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#friendsPage');
+			$('<a class="btn btnGold btnRounded" href="#" id="btnConfirmDeleteAllFriendsScript" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
 			$("#btnConfirmDeleteAllFriendsScript").click(function(e) {
 				e.preventDefault();
 
@@ -204,7 +234,13 @@ function Init(debug = false, dryrun = false) {
 										console.groupEnd();
 									};
 
-									swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch initial data.", "error");
+									swal({
+										allowOutsideClick: true,
+										text: "Something went wrong while trying to fetch initial data.",
+										title: err.status+" - "+err.statusText,
+										timer: 2500,
+										type: "error",
+									});
 								},
 								success: function(data){
 									if (debug) {
@@ -219,11 +255,23 @@ function Init(debug = false, dryrun = false) {
 									} 
 
 									if (data.Status == true && data.TotalCount > 0) {
-										RetrieveAllFriends(data);
+										RetrieveAllFriends([]);
 									} else if (data.Status == true && data.TotalCount == 0) {
-										swal("No friends", "There were no friends to delete.", "success");
+										swal({
+											allowOutsideClick: true,
+											text: "There were no friends to delete.",
+											title: "No friends",
+											timer: 2500,
+											type: "success",
+										});
 									} else {
-										swal("Something went wrong", "Something went wrong while trying to fetch initial data.", "error");
+										swal({
+											allowOutsideClick: true,
+											text: "Something went wrong while trying to fetch initial data.",
+											title: "Something went wrong",
+											timer: 2500,
+											type: "error",
+										});
 									}
 								}
 							});
@@ -237,7 +285,7 @@ function Init(debug = false, dryrun = false) {
 				}
 			});
 
-			$('<a class="btn btnGold btnRounded" href="#" id="btnQuickAddScript" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#friendsPage');
+			$('<a class="btn btnGold btnRounded" href="#" id="btnQuickAddScript" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
 			$("#btnQuickAddScript").click(function(e) {
 				e.preventDefault();
 
@@ -299,7 +347,13 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								swal(err.status+" - "+err.statusText, 'Something went wrong while trying to check whether "'+inputValue.trim()+'" exists or not.', "error");
+								swal({
+									allowOutsideClick: true,
+									text: 'Something went wrong while trying to check whether "'+inputValue.trim()+'" exists or not.',
+									title: err.status+" - "+err.statusText,
+									timer: 2500,
+									type: "error",
+								});
 							},
 							success: function(data){
 								if (debug) {
@@ -313,7 +367,17 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								AddFriend(data, inputValue);
+								if (data.Status == true) {
+									AddFriend(data, inputValue);
+								} else {
+									swal({
+										allowOutsideClick: true,
+										text: 'Something went wrong while trying to check whether "'+inputValue.trim()+'" exists or not.',
+										title: "Something went wrong",
+										timer: 2500,
+										type: "error",
+									});
+								}
 							}
 						});
 					});
@@ -344,7 +408,13 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch conversation data.", "error");
+								swal({
+									allowOutsideClick: true,
+									text: "Something went wrong while trying to fetch conversation data.",
+									title: err.status+" - "+err.statusText,
+									timer: 2500,
+									type: "error",
+								});
 							},
 							success: function(data){
 								if (debug) {
@@ -408,7 +478,13 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch messages.", "error");
+								if (source.length > 0) {
+									RetrieveAllMessages(source, target);
+								} else if (target.length > 0) {
+									if (debug) console.debug("RetrieveAllMessages() complete.");
+
+									RemoveMessage(target);
+								}
 							},
 							success: function(data){
 								if (debug) {
@@ -429,7 +505,7 @@ function Init(debug = false, dryrun = false) {
 								} else if (target.length > 0) {
 									if (debug) console.debug("RetrieveAllMessages() complete.");
 
-									RemoveAllMessages(target);
+									RemoveMessage(target);
 								}
 							}
 						});
@@ -440,14 +516,20 @@ function Init(debug = false, dryrun = false) {
 				}
 			}
 
-			function RemoveAllMessages(source){
+			function RemoveMessage(source){
 				try {
 					if (dryrun) return;
 
 					setTimeout(function() {
 						var item = source.pop();
+						if (item === undefined) {
+							if (debug) console.debug("RemoveMessage() SKIP undefined")
+							RemoveMessage(source);
+							return;
+						}
+
 						if (debug) {
-							console.groupCollapsed("RemoveAllMessages() POP");
+							console.groupCollapsed("RemoveMessage() POP");
 							console.group("Item");
 							console.debug(item);
 							console.groupEnd();
@@ -474,7 +556,23 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								console.error("The message sent by " + item.ScNickname + " could not be removed. ("+err.status+" - "+err.statusText+")");
+								if (item.ScNickname.toLowerCase() === siteMaster.authUserNickName.toLowerCase()) {
+									console.error("A message you sent to someone could not be removed. ("+err.status+" - "+err.statusText+")");
+								} else {
+									console.error("A message " + item.ScNickname + " sent to you could not be removed. ("+err.status+" - "+err.statusText+")");
+								}
+
+								if (source.length > 0) {
+									RemoveMessage(source);
+								} else {
+									swal({
+										allowOutsideClick: true,
+										text: "All of the messages in your inbox should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.",
+										title: "Messages removed",
+										timer: 2500,
+										type: "success",
+									});
+								}
 							},
 							success: function(data){
 								if (debug) {
@@ -503,9 +601,15 @@ function Init(debug = false, dryrun = false) {
 								}
 
 								if (source.length > 0) {
-									RemoveAllMessages(source);
+									RemoveMessage(source);
 								} else {
-									swal("Messages removed", "All of the messages in your inbox should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.", "success");
+									swal({
+										allowOutsideClick: true,
+										text: "All of the messages in your inbox should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.",
+										title: "Messages removed",
+										timer: 2500,
+										type: "success",
+									});
 								}
 							},
 							xhr: function() {
@@ -523,18 +627,16 @@ function Init(debug = false, dryrun = false) {
 						});
 					}, 1000)
 				} catch (err) {
-					console.error("Error during RemoveAllMessages():\n\n"+err.stack);
+					console.error("Error during RemoveMessage():\n\n"+err.stack);
 					return;
 				}
 			}
 
-			function RetrieveAllFriends(responseData){
+			function RetrieveAllFriends(source, pageIndex = 0){
 				try {
-					var children = [];
-
-					for (var i = 0; i <= Math.ceil(responseData.TotalCount / 12); i++) {
+					setTimeout(function() {
 						$.ajax({
-							url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber="+i+"&onlineService=sc&pendingInvitesOnly=false",
+							url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber="+pageIndex+"&onlineService=sc&pendingInvitesOnly=false",
 							headers: {
 								"Accept": "application/json",
 								"RequestVerificationToken": requestToken
@@ -551,7 +653,13 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								swal(err.status+" - "+err.statusText, "Something went wrong while trying to fetch data from page "+i+".", "error");
+								swal({
+									allowOutsideClick: true,
+									text: "Something went wrong while trying to fetch data from page "+pageIndex+".",
+									title: err.status+" - "+err.statusText,
+									timer: 2500,
+									type: "error",
+								});
 							},
 							success: function(data){
 								if (debug) {
@@ -567,49 +675,302 @@ function Init(debug = false, dryrun = false) {
 
 								if (data.Status == true) {
 									data.RockstarAccounts.forEach(function(e){
-										children.push(e);
+										if (e !== undefined) source.push(e);
 									});
-
-									if (children.length == responseData.TotalCount){
-										FriendsLoop(children, false);
-									};
 								} else {
-									swal("Something went wrong", "Something went wrong while trying to fetch data from page "+i+".", "error");
+									swal({
+										allowOutsideClick: true,
+										text: "Something went wrong while trying to fetch data from page "+pageIndex+".",
+										title: "Something went wrong",
+										timer: 2500,
+										type: "error",
+									});
+								}
+
+								if (source.length < data.TotalCount) {
+									RetrieveAllFriends(source, (pageIndex + 1));
+								} else {
+									if (debug) console.debug("RetrieveAllFriends() complete.");
+
+									RemoveFriend(source);
 								}
 							}
 						});
-					};
+					}, 1000)
 				} catch (err) {
 					console.error("Error during RetrieveAllFriends():\n\n"+err.stack);
 					return;
 				}
 			}
 
-			function FriendsLoop(array, isFriendRequestLoop) {
+			function RemoveFriend(source, isFriendRequestLoop = false) {
 				try {
-					setTimeout(function() {
-						if (array.length > 0) {
-							var item = array.pop();
-							if (debug) {
-								console.groupCollapsed("FriendsLoop() POP");
-								console.group("Item");
-								console.debug(item);
-								console.groupEnd();
-								console.groupEnd();
-							};
+					if (dryrun) return;
 
-							RemoveFriend(item);
-							FriendsLoop(array, isFriendRequestLoop);
+					setTimeout(function() {
+						var item = source.pop();
+						if (item === undefined) {
+							if (debug) console.debug("RemoveFriend() SKIP undefined")
+							RemoveFriend(source);
+							return;
+						}
+
+						if (item.AllowDelete === true) {
+							$.ajax({
+								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+								type: "PUT",
+								data: '{"id":'+item.RockstarId+',"op":"delete"}',
+								headers: {
+									"Content-Type": "application/json",
+									"RequestVerificationToken": requestToken
+								},
+								error: function(err){
+									if (debug) {
+										console.groupCollapsed("UpdateFriend AJAX FAIL");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(err);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									console.error("Your friend " + item.Name + " could not be removed. ("+err.status+" - "+err.statusText+")");
+								},
+								success: function(data){
+									if (debug) {
+										console.groupCollapsed("UpdateFriend AJAX OK");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(data);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									if (data.Status == true) {
+										console.info("Your friend " + item.Name + " has been removed.");
+									} else {
+										console.error("Your friend " + item.Name + " could not be removed.");
+									}
+
+									if (source.length > 0) {
+										RemoveFriend(source);
+									} else {
+										if (isFriendRequestLoop) {
+											swal({
+												allowOutsideClick: true,
+												text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+												title: "Friend requests rejected",
+												timer: 2500,
+												type: "success",
+											});
+										} else {
+											swal({
+												allowOutsideClick: true,
+												text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+												title: "Friends removed",
+												timer: 2500,
+												type: "success",
+											});
+										}
+									}
+								},
+								xhr: function() {
+									// No cross-origin header. :-)
+									var xhr = jQuery.ajaxSettings.xhr();
+									var setRequestHeader = xhr.setRequestHeader;
+									
+									xhr.setRequestHeader = function(name, value) {
+										if (name == 'X-Requested-With') return;
+										setRequestHeader.call(this, name, value);
+									}
+
+									return xhr;
+								}
+							});
+						} else if (item.AllowCancel === true) {
+							$.ajax({
+								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+								type: "PUT",
+								data: '{"id":'+item.RockstarId+',"op":"cancel"}',
+								headers: {
+									"Content-Type": "application/json",
+									"RequestVerificationToken": requestToken
+								},
+								error: function(err){
+									if (debug) {
+										console.groupCollapsed("UpdateFriend AJAX FAIL");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(err);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									console.error("The friend request you sent to " + item.Name + " could not be cancelled. ("+err.status+" - "+err.statusText+")");
+								},
+								success: function(data){
+									if (debug) {
+										console.groupCollapsed("UpdateFriend AJAX OK");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(data);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									if (data.Status == true) {
+										console.info("The friend request you sent to " + item.Name + " has been cancelled.");
+									} else {
+										console.error("The friend request you sent to " + item.Name + " could not be cancelled.");
+									}
+
+									if (source.length > 0) {
+										RemoveFriend(source);
+									} else {
+										if (isFriendRequestLoop) {
+											swal({
+												allowOutsideClick: true,
+												text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+												title: "Friend requests rejected",
+												timer: 2500,
+												type: "success",
+											});
+										} else {
+											swal({
+												allowOutsideClick: true,
+												text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+												title: "Friends removed",
+												timer: 2500,
+												type: "success",
+											});
+										}
+									}
+								},
+								xhr: function() {
+									// No cross-origin header. :-)
+									var xhr = jQuery.ajaxSettings.xhr();
+									var setRequestHeader = xhr.setRequestHeader;
+									
+									xhr.setRequestHeader = function(name, value) {
+										if (name == 'X-Requested-With') return;
+										setRequestHeader.call(this, name, value);
+									}
+
+									return xhr;
+								}
+							});
+						} else if (item.AllowAdd === true) {
+							$.ajax({
+								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+								type: "PUT",
+								data: '{"id":'+item.RockstarId+',"op":"ignore"}',
+								headers: {
+									"Content-Type": "application/json",
+									"RequestVerificationToken": requestToken
+								},
+								error: function(err){
+									if (debug) {
+										console.groupCollapsed("UpdateFriend AJAX FAIL");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(err);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									console.error("The friend request you received from " + item.Name + " could not be rejected. ("+err.status+" - "+err.statusText+")");
+								},
+								success: function(data){
+									if (debug) {
+										console.groupCollapsed("UpdateFriend AJAX OK");
+										console.group("Request");
+										console.debug(this);
+										console.groupEnd();
+										console.group("Response");
+										console.debug(data);
+										console.groupEnd();
+										console.groupEnd();
+									};
+
+									if (data.Status == true) {
+										console.info("The friend request you received from " + item.Name + " has been rejected.");
+									} else {
+										console.error("The friend request you received from " + item.Name + " could not be rejected.");
+									}
+
+									if (source.length > 0) {
+										RemoveFriend(source);
+									} else {
+										if (isFriendRequestLoop) {
+											swal({
+												allowOutsideClick: true,
+												text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+												title: "Friend requests rejected",
+												timer: 2500,
+												type: "success",
+											});
+										} else {
+											swal({
+												allowOutsideClick: true,
+												text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+												title: "Friends removed",
+												timer: 2500,
+												type: "success",
+											});
+										}
+									}
+								},
+								xhr: function() {
+									// No cross-origin header. :-)
+									var xhr = jQuery.ajaxSettings.xhr();
+									var setRequestHeader = xhr.setRequestHeader;
+									
+									xhr.setRequestHeader = function(name, value) {
+										if (name == 'X-Requested-With') return;
+										setRequestHeader.call(this, name, value);
+									}
+
+									return xhr;
+								}
+							});
 						} else {
-							if (isFriendRequestLoop) {
-								swal("Friend requests rejected", "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.", "success");
+							console.warn("The user " + item.Name + " has been skipped (reason: type \""+item.Relationship+"\" not supported).");
+
+							if (source.length > 0) {
+								RemoveFriend(source);
 							} else {
-								swal("Friends removed", "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.", "success");
+								if (isFriendRequestLoop) {
+									swal({
+										allowOutsideClick: true,
+										text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+										title: "Friend requests rejected",
+										timer: 2500,
+										type: "success",
+									});
+								} else {
+									swal({
+										allowOutsideClick: true,
+										text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+										title: "Friends removed",
+										timer: 2500,
+										type: "success",
+									});
+								}
 							}
 						}
 					}, 1000)
 				} catch (err) {
-					console.error("Error during FriendsLoop():\n\n"+err.stack);
+					console.error("Error during RemoveFriend():\n\n"+err.stack);
 					return;
 				}
 			}
@@ -639,7 +1000,13 @@ function Init(debug = false, dryrun = false) {
 									console.groupEnd();
 								};
 
-								swal(err.status+" - "+err.statusText, 'Something went wrong trying to add "' + rockstarObj.Nickname + '".', "error");
+								swal({
+									allowOutsideClick: true,
+									text: 'Something went wrong trying to add "' + rockstarObj.Nickname + '".',
+									title: err.status+" - "+err.statusText,
+									timer: 2500,
+									type: "error",
+								});
 							},
 							success: function(data){
 								if (debug) {
@@ -654,9 +1021,21 @@ function Init(debug = false, dryrun = false) {
 								};
 
 								if (data.Status == true) {
-									swal("User added", 'A friend request has been sent to "' + rockstarObj.Nickname + '".\n\nTo view the changes to your friends list, please refresh the page.', "success");
+									swal({
+										allowOutsideClick: true,
+										text: 'A friend request has been sent to "' + rockstarObj.Nickname + '".\n\nTo view the changes to your friends list, please refresh the page.',
+										title: "User added",
+										timer: 2500,
+										type: "success",
+									});
 								} else {
-									swal("Something went wrong", 'Something went wrong trying to add "' + rockstarObj.Nickname + '".', "error");
+									swal({
+										allowOutsideClick: true,
+										text: 'Something went wrong trying to add "' + rockstarObj.Nickname + '".',
+										title: "Something went wrong",
+										timer: 2500,
+										type: "error",
+									});
 								}
 							},
 							xhr: function() {
@@ -673,185 +1052,16 @@ function Init(debug = false, dryrun = false) {
 							}
 						});
 					} else {
-						swal("User not found", 'The nickname "'+inputValue+'" doesn\'t exist.', "warning");
+						swal({
+							allowOutsideClick: true,
+							text: 'The nickname "'+inputValue+'" doesn\'t exist.',
+							title: "User not found",
+							timer: 2500,
+							type: "warning",
+						});
 					}
 				} catch (err) {
 					console.error("Error during AddFriend():\n\n"+err.stack);
-					return;
-				}
-			}
-
-			function RemoveFriend(rockstarObj) {
-				try {
-					if (dryrun) return;
-
-					if (rockstarObj.AllowDelete === true) {
-						$.ajax({
-							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
-							type: "PUT",
-							data: '{"id":'+rockstarObj.RockstarId+',"op":"delete"}',
-							headers: {
-								"Content-Type": "application/json",
-								"RequestVerificationToken": requestToken
-							},
-							error: function(err){
-								if (debug) {
-									console.groupCollapsed("UpdateFriend AJAX FAIL");
-									console.group("Request");
-									console.debug(this);
-									console.groupEnd();
-									console.group("Response");
-									console.debug(err);
-									console.groupEnd();
-									console.groupEnd();
-								};
-
-								console.error("Your friend " + rockstarObj.Name + " could not be removed. ("+err.status+" - "+err.statusText+")");
-							},
-							success: function(data){
-								if (debug) {
-									console.groupCollapsed("UpdateFriend AJAX OK");
-									console.group("Request");
-									console.debug(this);
-									console.groupEnd();
-									console.group("Response");
-									console.debug(data);
-									console.groupEnd();
-									console.groupEnd();
-								};
-
-								if (data.Status == true) {
-									console.info("Your friend " + rockstarObj.Name + " has been removed.");
-								} else {
-									console.error("Your friend " + rockstarObj.Name + " could not be removed.");
-								}
-							},
-							xhr: function() {
-								// No cross-origin header. :-)
-								var xhr = jQuery.ajaxSettings.xhr();
-								var setRequestHeader = xhr.setRequestHeader;
-								
-								xhr.setRequestHeader = function(name, value) {
-									if (name == 'X-Requested-With') return;
-									setRequestHeader.call(this, name, value);
-								}
-
-								return xhr;
-							}
-						});
-					} else if (rockstarObj.AllowCancel === true) {
-						$.ajax({
-							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
-							type: "PUT",
-							data: '{"id":'+rockstarObj.RockstarId+',"op":"cancel"}',
-							headers: {
-								"Content-Type": "application/json",
-								"RequestVerificationToken": requestToken
-							},
-							error: function(err){
-								if (debug) {
-									console.groupCollapsed("UpdateFriend AJAX FAIL");
-									console.group("Request");
-									console.debug(this);
-									console.groupEnd();
-									console.group("Response");
-									console.debug(err);
-									console.groupEnd();
-									console.groupEnd();
-								};
-
-								console.error("The friend request you sent to " + rockstarObj.Name + " could not be cancelled. ("+err.status+" - "+err.statusText+")");
-							},
-							success: function(data){
-								if (debug) {
-									console.groupCollapsed("UpdateFriend AJAX OK");
-									console.group("Request");
-									console.debug(this);
-									console.groupEnd();
-									console.group("Response");
-									console.debug(data);
-									console.groupEnd();
-									console.groupEnd();
-								};
-
-								if (data.Status == true) {
-									console.info("The friend request you sent to " + rockstarObj.Name + " has been cancelled.");
-								} else {
-									console.error("The friend request you sent to " + rockstarObj.Name + " could not be cancelled.");
-								}
-							},
-							xhr: function() {
-								// No cross-origin header. :-)
-								var xhr = jQuery.ajaxSettings.xhr();
-								var setRequestHeader = xhr.setRequestHeader;
-								
-								xhr.setRequestHeader = function(name, value) {
-									if (name == 'X-Requested-With') return;
-									setRequestHeader.call(this, name, value);
-								}
-
-								return xhr;
-							}
-						});
-					} else if (rockstarObj.AllowAdd === true) {
-						$.ajax({
-							url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
-							type: "PUT",
-							data: '{"id":'+rockstarObj.RockstarId+',"op":"ignore"}',
-							headers: {
-								"Content-Type": "application/json",
-								"RequestVerificationToken": requestToken
-							},
-							error: function(err){
-								if (debug) {
-									console.groupCollapsed("UpdateFriend AJAX FAIL");
-									console.group("Request");
-									console.debug(this);
-									console.groupEnd();
-									console.group("Response");
-									console.debug(err);
-									console.groupEnd();
-									console.groupEnd();
-								};
-
-								console.error("The friend request you received from " + rockstarObj.Name + " could not be rejected. ("+err.status+" - "+err.statusText+")");
-							},
-							success: function(data){
-								if (debug) {
-									console.groupCollapsed("UpdateFriend AJAX OK");
-									console.group("Request");
-									console.debug(this);
-									console.groupEnd();
-									console.group("Response");
-									console.debug(data);
-									console.groupEnd();
-									console.groupEnd();
-								};
-
-								if (data.Status == true) {
-									console.info("The friend request you received from " + rockstarObj.Name + " has been rejected.");
-								} else {
-									console.error("The friend request you received from " + rockstarObj.Name + " could not be rejected.");
-								}
-							},
-							xhr: function() {
-								// No cross-origin header. :-)
-								var xhr = jQuery.ajaxSettings.xhr();
-								var setRequestHeader = xhr.setRequestHeader;
-								
-								xhr.setRequestHeader = function(name, value) {
-									if (name == 'X-Requested-With') return;
-									setRequestHeader.call(this, name, value);
-								}
-
-								return xhr;
-							}
-						});
-					} else {
-						console.warn("The user " + rockstarObj.Name + " has been skipped (reason: type \""+rockstarObj.Relationship+"\" not supported).");
-					}
-				} catch (err) {
-					console.error("Error during RemoveFriend():\n\n"+err.stack);
 					return;
 				}
 			}
@@ -868,7 +1078,7 @@ function Init(debug = false, dryrun = false) {
 					type: "warning"
 				},
 				function(){
-					window.location.href = "https://socialclub.rockstargames.com/friends/index";
+					window.location.href = "https://socialclub.rockstargames.com/";
 				});
 			} catch (err) {
 				console.error("Error during otherPage swal():\n\n"+err.stack);
