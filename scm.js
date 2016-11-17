@@ -48,10 +48,10 @@ function Init(debug, dryRun) {
 			}
 
 			if (!document.getElementById("nt-dam")) {
-				$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;">delete all messages</a>').prependTo('#page');
+				$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
 			} else {
 				$("#nt-dam").remove();
-				$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;">delete all messages</a>').prependTo('#page');
+				$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
 				if (debug) console.log("#nt-dam was already present.");
 			}
 
@@ -671,7 +671,6 @@ function Init(debug, dryRun) {
 								}
 							},
 							xhr: function() {
-								// No cross-origin header. :-)
 								var xhr = jQuery.ajaxSettings.xhr();
 								var setRequestHeader = xhr.setRequestHeader;
 								
@@ -840,7 +839,6 @@ function Init(debug, dryRun) {
 									}
 								},
 								xhr: function() {
-									// No cross-origin header. :-)
 									var xhr = jQuery.ajaxSettings.xhr();
 									var setRequestHeader = xhr.setRequestHeader;
 									
@@ -916,7 +914,6 @@ function Init(debug, dryRun) {
 									}
 								},
 								xhr: function() {
-									// No cross-origin header. :-)
 									var xhr = jQuery.ajaxSettings.xhr();
 									var setRequestHeader = xhr.setRequestHeader;
 									
@@ -992,7 +989,6 @@ function Init(debug, dryRun) {
 									}
 								},
 								xhr: function() {
-									// No cross-origin header. :-)
 									var xhr = jQuery.ajaxSettings.xhr();
 									var setRequestHeader = xhr.setRequestHeader;
 									
@@ -1099,7 +1095,6 @@ function Init(debug, dryRun) {
 							}
 						},
 						xhr: function() {
-							// No cross-origin header. :-)
 							var xhr = jQuery.ajaxSettings.xhr();
 							var setRequestHeader = xhr.setRequestHeader;
 							
