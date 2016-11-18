@@ -3,7 +3,8 @@
 ## Usage
 
 To use, add the following as the URL of a bookmark, then click it!
-Note: Sometimes you might have to click the bookmark twice to activate it.
+
+**Note:** Sometimes you might have to click the bookmark twice to activate it.
 
 ```
 javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Nadermane/SocialClubManager/a6aa4b80d2e800d679cb97d8676e389fd445fa45/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){Init("",0,0)},1e3);})();
