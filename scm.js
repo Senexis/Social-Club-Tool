@@ -1058,7 +1058,7 @@ function Init(friendMessage, debug, dryRun) {
 							$.ajax({
 								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
 								type: "PUT",
-								data: '{"id":'+source.RockstarId+',"op":"addfriend","custommessage":"'+friendMessage.replace(/\s\s+/g, ' ')+'"}',
+								data: '{"id":'+source.RockstarId+',"op":"addfriend","custommessage":"'+friendMessage.trim().replace(/\s\s+/g, ' ')+'"}',
 								headers: {
 									"Content-Type": "application/json",
 									"RequestVerificationToken": verificationToken
