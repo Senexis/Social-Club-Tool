@@ -1,6 +1,7 @@
 function Init(debug, dryRun) {
 	if (debug === undefined) debug = false;
 	if (dryRun === undefined) dryRun = false;
+	var isReloaded = false;
 
 	try {
 		if (!document.getElementById("nt-jqjs")) {
@@ -9,6 +10,7 @@ function Init(debug, dryRun) {
 			jqjs.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js";
 			document.getElementsByTagName('head')[0].appendChild(jqjs);
 		} else {
+			isReloaded = true;
 			if (debug) console.log("jQuery JS was already present.");
 		}
 
@@ -19,6 +21,7 @@ function Init(debug, dryRun) {
 			sacss.href = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css";
 			document.getElementsByTagName('head')[0].appendChild(sacss);
 		} else {
+			isReloaded = true;
 			if (debug) console.log("SweetAlert CSS was already present.");
 		}
 
@@ -28,6 +31,7 @@ function Init(debug, dryRun) {
 			sajs.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
 			document.getElementsByTagName('head')[0].appendChild(sajs);
 		} else {
+			isReloaded = true;
 			if (debug) console.log("SweetAlert JS was already present.");
 		}
 	} catch (err) {
@@ -53,6 +57,7 @@ function Init(debug, dryRun) {
 					} else {
 						$("#nt-cred").remove();
 						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane">Nadermane</a></li>').appendTo('#footerNav');
+						isReloaded = true;
 						if (debug) console.log("#nt-cred was already present.");
 					}
 
@@ -61,6 +66,7 @@ function Init(debug, dryRun) {
 					} else {
 						$("#nt-dam").remove();
 						$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
+						isReloaded = true;
 						if (debug) console.log("#nt-dam was already present.");
 					}
 
@@ -148,6 +154,7 @@ function Init(debug, dryRun) {
 					} else {
 						$("#nt-raf").remove();
 						$('<a class="btn btnGold btnRounded" href="#" id="nt-raf" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
+						isReloaded = true;
 						if (debug) console.log("#nt-raf was already present.");
 					}
 
@@ -251,6 +258,7 @@ function Init(debug, dryRun) {
 					} else {
 						$("#nt-daf").remove();
 						$('<a class="btn btnGold btnRounded" href="#" id="nt-daf" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
+						isReloaded = true;
 						if (debug) console.log("#nt-daf was already present.");
 					}
 
@@ -346,6 +354,7 @@ function Init(debug, dryRun) {
 					} else {
 						$("#nt-qa").remove();
 						$('<a class="btn btnGold btnRounded" href="#" id="nt-qa" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
+						isReloaded = true;
 						if (debug) console.log("#nt-qa was already present.");
 					}
 
@@ -1120,6 +1129,8 @@ function Init(debug, dryRun) {
 							return;
 						}
 					}
+
+					console.info("The Social Club tool was "+(isReloaded ? "re" : "")+"loaded successfully.");
 				} else {
 					swal({
 						allowOutsideClick: true,
