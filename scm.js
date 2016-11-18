@@ -1140,7 +1140,7 @@ function Init(debug, dryRun) {
 					closeOnConfirm: false,
 					confirmButtonText: "Yes",
 					showCancelButton: true,
-					text: "Whoops, you accidentally activated the Social Club tool on a wrong web page. To use the script, first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club main page now?",
+					text: "Whoops, you accidentally activated the Social Club tool on a wrong web page. To use the Social Club tool, first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club main page now?",
 					title: "Wrong site",
 					type: "warning"
 				},
