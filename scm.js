@@ -1,4 +1,5 @@
-function Init(debug, dryRun) {
+function Init(friendMessage, debug, dryRun) {
+	if (friendMessage === undefined) friendMessage = "";
 	if (debug === undefined) debug = false;
 	if (dryRun === undefined) dryRun = false;
 	var isReloaded = false;
@@ -82,7 +83,7 @@ function Init(debug, dryRun) {
 								confirmButtonText: "Yes",
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All messages will be deleted from your inbox.",
+								text: "All messages will be deleted from your inbox.\n\nThis process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -170,7 +171,7 @@ function Init(debug, dryRun) {
 								confirmButtonText: "Yes",
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All friend requests you have received will be rejected.",
+								text: "All friend requests you have received will be rejected.\n\nThis process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -274,7 +275,7 @@ function Init(debug, dryRun) {
 								confirmButtonText: "Yes",
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All friends will be removed from your friend list.",
+								text: "All friends will be removed from your friend list.\n\nThis process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -1057,7 +1058,7 @@ function Init(debug, dryRun) {
 							$.ajax({
 								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
 								type: "PUT",
-								data: '{"id":'+source.RockstarId+',"op":"addfriend","custommessage":""}',
+								data: '{"id":'+source.RockstarId+',"op":"addfriend","custommessage":"'+friendMessage.replace(/\s\s+/g, ' ')+'"}',
 								headers: {
 									"Content-Type": "application/json",
 									"RequestVerificationToken": verificationToken
