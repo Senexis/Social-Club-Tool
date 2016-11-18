@@ -1,4 +1,4 @@
-# SocialClubManager
+# Social Club Tool
 
 ## Usage
 
