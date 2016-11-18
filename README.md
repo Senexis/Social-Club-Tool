@@ -10,8 +10,8 @@ javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document
 ```
 
 ## Customization
-To customize the social tool by enabling some additional features, you can edit the `Init("",0,0)` part of the bookmark. `""` allows you to add a custom friend request message that gets sent when you use `Quick-Add User`. Setting the first `0` to `1` allows you to see debug-oriented information the Social Club tool; examples are AJAX request details and responses, popped objects from a queue and other useful information. Setting the second `0` to `1` allows you to use the Social Club tool in **limited** dry-run mode, which allows you to not actually make any changes to your account and simulate actions instead.
+To customize the social tool by enabling some additional features, you can edit the `Init("",0,0)` part of the bookmark. `""` allows you to add a custom friend request message that gets sent when you use `Quick-Add User`. Setting the first `0` to `1` allows you to see debug-oriented information the Social Club tool outputs. Examples are AJAX request details and responses, popped objects from a queue and other useful information. Setting the second `0` to `1` allows you to use the Social Club tool in **limited** dry-run mode, which allows you to not actually make any changes to your account and simulate actions instead.
 
-Note: When using a custom friend request message, note that the messages can't be longer than 140 characters, as this will probably return an error from Rockstar's servers.
+**Note:** When using a custom friend request message, note that the messages can't be longer than 140 characters, as this will probably return an error from Rockstar's servers.
 
-Note: Dry-run mode has flaws. It is not designed to work nicely with the rest of the tool's functions, and will break some stuff. It is unsupported.
+**Note:** Dry-run mode has flaws. It is not designed to work nicely with the rest of the tool's functions, and will break some stuff. It is unsupported.
