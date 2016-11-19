@@ -533,6 +533,12 @@ function Init(friendMessage, checkBlocked, debug) {
 
 							setTimeout(function() {
 								var item = source.pop();
+								if (item === undefined) {
+									if (debug) console.log("RetrieveAllMessages() SKIP undefined")
+									RetrieveAllMessages(source, target);
+									return;
+								}
+
 								if (debug) {
 									console.groupCollapsed("RetrieveAllMessages() POP");
 									console.group("Item");
@@ -791,9 +797,17 @@ function Init(friendMessage, checkBlocked, debug) {
 								var item = source.pop();
 								if (item === undefined) {
 									if (debug) console.log("RemoveFriend() SKIP undefined")
-									RemoveFriend(source);
+									RemoveFriend(source, isFriendRequestLoop);
 									return;
 								}
+
+								if (debug) {
+									console.groupCollapsed("RemoveFriend() POP");
+									console.group("Item");
+									console.log(item);
+									console.groupEnd();
+									console.groupEnd();
+								};
 
 								if (item.AllowDelete === true) {
 									$.ajax({
