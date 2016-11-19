@@ -54,10 +54,10 @@ function Init(friendMessage, checkBlocked, debug) {
 
 				if (userNickname != "" && userId != 0) {
 					if (!document.getElementById("nt-cred")) {
-						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane">Nadermane</a></li>').appendTo('#footerNav');
+						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane" target="_blank">Nadermane</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 					} else {
 						$("#nt-cred").remove();
-						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane">Nadermane</a></li>').appendTo('#footerNav');
+						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane" target="_blank">Nadermane</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 						isReloaded = true;
 						if (debug) console.log("#nt-cred was already present.");
 					}
@@ -370,7 +370,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								inputPlaceholder: "Social Club username",
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: 'Please enter the Social Club username you want to add. When you click "Add", the username will automatically be added if it exists.',
+								text: 'Please enter the Social Club username you want to add. When you click "Add", the user will automatically be added if it exists.'+(checkBlocked ? "" : "\n\nNote: You have disabled the blocked users list check. If the user is on your blocked users list, they will be unblocked and sent a friend request.")+(friendMessage.trim() == "" ? "" : "\n\nNote: You have set a custom friend request message, which will get sent to the user."),
 								title: "Enter username",
 								type: "input",
 							},
