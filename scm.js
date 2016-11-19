@@ -1,7 +1,7 @@
-function Init(friendMessage, debug, dryRun) {
+function Init(friendMessage, checkBlocked, debug) {
 	if (friendMessage === undefined) friendMessage = "";
+	if (checkBlocked === undefined) checkBlocked = true;
 	if (debug === undefined) debug = false;
-	if (dryRun === undefined) dryRun = false;
 	var isReloaded = false;
 
 	try {
@@ -441,7 +441,11 @@ function Init(friendMessage, debug, dryRun) {
 										};
 
 										if (data.Status == true) {
-											AddFriend(data);
+											if (checkBlocked) {
+												RetrieveBlockedList(data);
+											} else {
+												AddFriend(data);
+											}
 										} else {
 											swal({
 												allowOutsideClick: true,
@@ -593,10 +597,8 @@ function Init(friendMessage, debug, dryRun) {
 						}
 					}
 
-					function RemoveMessage(source){
+					function RemoveMessage(source) {
 						try {
-							if (dryRun) return;
-
 							setTimeout(function() {
 								var item = source.pop();
 								if (item === undefined) {
@@ -708,7 +710,7 @@ function Init(friendMessage, debug, dryRun) {
 						}
 					}
 
-					function RetrieveAllFriends(source, pageIndex){
+					function RetrieveAllFriends(source, pageIndex) {
 						try {
 							if (pageIndex === undefined) pageIndex = 0;
 
@@ -783,7 +785,6 @@ function Init(friendMessage, debug, dryRun) {
 
 					function RemoveFriend(source, isFriendRequestLoop) {
 						try {
-							if (dryRun) return;
 							if (isFriendRequestLoop === undefined) isFriendRequestLoop = false;
 
 							setTimeout(function() {
@@ -1051,10 +1052,89 @@ function Init(friendMessage, debug, dryRun) {
 						}
 					}
 
-					function AddFriend(source){
+					function RetrieveBlockedList(source) {
 						try {
-							if (dryRun) return;
+							var target = [];
 
+							setTimeout(function() {
+								$.ajax({
+									url: "https://socialclub.rockstargames.com/friends/GetBlockedJson",
+									headers: {
+										"Accept": "application/json",
+										"RequestVerificationToken": verificationToken
+									},
+									error: function(err){
+										if (debug) {
+											console.groupCollapsed("GetBlockedJson AJAX FAIL");
+											console.group("Request");
+											console.log(this);
+											console.groupEnd();
+											console.group("Response");
+											console.log(err);
+											console.groupEnd();
+											console.groupEnd();
+										};
+
+										swal({
+											allowOutsideClick: true,
+											text: "Something went wrong while trying to retrieve blocked users.",
+											title: err.status+" - "+err.statusText,
+											timer: 5000,
+											type: "error",
+										});
+									},
+									success: function(data){
+										if (debug) {
+											console.groupCollapsed("GetBlockedJson AJAX OK");
+											console.group("Request");
+											console.log(this);
+											console.groupEnd();
+											console.group("Response");
+											console.log(data);
+											console.groupEnd();
+											console.groupEnd();
+										};
+
+										if (data.Status == true) {
+											data.RockstarAccounts.forEach(function(e){
+												if (e !== undefined) target.push(e);
+											});
+
+											var obj = target.filter(function(obj) {
+												return obj.Name.trim().toLowerCase() === source.Nickname.trim().toLowerCase();
+											})[0];
+
+											if (obj == undefined) {
+												AddFriend(source);
+											} else {
+												swal({
+													allowOutsideClick: true,
+													text: source.Nickname+" is on your blocked users list. To be able to send them a friend request, remove them from your blocked users list, then try again.",
+													title: "User blocked",
+													timer: 5000,
+													type: "warning",
+												});
+											}
+										} else {
+											swal({
+												allowOutsideClick: true,
+												text: "Something went wrong while trying to retrieve blocked users.",
+												title: "Something went wrong",
+												timer: 5000,
+												type: "error",
+											});
+										}
+									}
+								});
+							}, 1000)
+						} catch (err) {
+							console.error("Error during RetrieveBlockedList():\n\n"+err.stack);
+							return;
+						}
+					}
+
+					function AddFriend(source) {
+						try {
 							$.ajax({
 								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
 								type: "PUT",
