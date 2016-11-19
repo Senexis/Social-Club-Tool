@@ -14,7 +14,7 @@ javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document
 To customize the social tool by enabling some additional features, you can edit the `Init("",1,0)` part of the bookmark. To see what parameter does what, please see the table below.
 
 Parameter | Options | Usage
---- | ---
+--- | --- | ---
 Init(**""**, 1, 0) | `""` or `"Your message here."` | Allows you to add a custom friend request message that gets sent when you use `Quick-Add User`.
 Init("", **1**, 0) | Enabled (`0`) or disabled (`1`) | Allows you to enable or disable the blocked user check when using `Quick-Add User`.
 Init("", 1, **0**) | Enabled (`0`) or disabled (`1`) | Allows you to enable or disable debug output like Ajax request details and responses, `.pop()` objects, etc.
