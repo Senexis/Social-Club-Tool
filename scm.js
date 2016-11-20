@@ -684,12 +684,12 @@ function Init(friendMessage, checkBlocked, debug) {
 										} else {
 											if (item.ScNickname != undefined) {
 												if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
-													console.info("A message you sent to someone has been removed.");
+													console.info("A message you sent to someone could not be removed.");
 												} else {
-													console.info("A message " + item.ScNickname + " sent to you has been removed.");
+													console.info("A message " + item.ScNickname + " sent to you could not be removed.");
 												}
 											} else {
-												console.info("A message someone sent to you has been removed.");
+												console.info("A message someone sent to you could not be removed.");
 											}
 										}
 
