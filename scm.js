@@ -223,7 +223,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												});
 
 												if (children.length == data.TotalCount) {
-													RetrieveAllFriends(children, true);
+													RemoveFriend(children, true);
 												};
 											} else if (data.Status == true && data.TotalCount == 0) {
 												swal({
@@ -672,16 +672,24 @@ function Init(friendMessage, checkBlocked, debug) {
 										};
 
 										if (data.Status == true) {
-											if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
-												console.info("A message you sent to someone has been removed.");
+											if (item.ScNickname != undefined) {
+												if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
+													console.info("A message you sent to someone has been removed.");
+												} else {
+													console.info("A message " + item.ScNickname + " sent to you has been removed.");
+												}
 											} else {
-												console.info("A message " + item.ScNickname + " sent to you has been removed.");
+												console.info("A message someone sent to you has been removed.");
 											}
 										} else {
-											if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
-												console.info("A message you sent to someone could not be removed.");
+											if (item.ScNickname != undefined) {
+												if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
+													console.info("A message you sent to someone has been removed.");
+												} else {
+													console.info("A message " + item.ScNickname + " sent to you has been removed.");
+												}
 											} else {
-												console.info("A message " + item.ScNickname + " sent to you could not be removed.");
+												console.info("A message someone sent to you has been removed.");
 											}
 										}
 
