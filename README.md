@@ -7,7 +7,7 @@ To use, add the following as the URL of a bookmark, then click it!
 **Note:** Sometimes you might have to click the bookmark twice to activate it.
 
 ```
-javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Nadermane/Social-Club-Tool/89bac302d4e5d81644b0009bd22427a4af7146d2/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){Init("",1,0)},1e3);})();
+javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Nadermane/Social-Club-Tool/7d896fa00a4c941f8172a7620e61aefda9ef6346/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){Init("",1,0)},1e3);})();
 ```
 
 ## Customization
