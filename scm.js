@@ -285,7 +285,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								html: true,
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All friends will be removed from your friend list.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-daf-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-daf-progress-current\">0</span> of <span id=\"nt-daf-progress-total\">0</span> friend(s) remaining...</strong>",
+								text: "All friends will be removed from your friend list.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-daf-retrieving\" style=\"font-weight:bold;display:none;\"><br /><br />Retrieving friends...</strong><strong id=\"nt-daf-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-daf-progress-current\">0</span> of <span id=\"nt-daf-progress-total\">0</span> friend(s) remaining...</strong>",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -332,7 +332,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											if (data.Status == true && data.TotalCount > 0) {
 												$('#nt-daf-progress-current').text(data.TotalCount);
 												$('#nt-daf-progress-total').text(data.TotalCount);
-												$('#nt-daf-progress').show();
+												$('#nt-daf-retrieving').show();
 
 												RetrieveAllFriends([]);
 											} else if (data.Status == true && data.TotalCount == 0) {
@@ -811,6 +811,9 @@ function Init(friendMessage, checkBlocked, debug) {
 											RetrieveAllFriends(source, (pageIndex + 1));
 										} else {
 											if (debug) console.log("RetrieveAllFriends() complete.");
+
+											$('#nt-daf-retrieving').hide();
+											$('#nt-daf-progress').show();
 
 											RemoveFriend(source);
 										}
