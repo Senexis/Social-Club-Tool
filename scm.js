@@ -46,13 +46,13 @@ function Init(friendMessage, checkBlocked, debug) {
 				try {
 					var verificationToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
 					var userNickname = siteMaster.authUserNickName;
-					var userId = siteMaster.authUserId;
+					var isLoggedIn = siteMaster.isLoggedIn;
 				} catch (err) {
 					console.error("Error retrieving account data:\n\n"+err.stack);
 					return;
 				}
 
-				if (userNickname != "" && userId != 0) {
+				if (userNickname != "" && isLoggedIn) {
 					if (!document.getElementById("nt-cred")) {
 						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane" target="_blank">Nadermane</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 					} else {
@@ -81,9 +81,10 @@ function Init(friendMessage, checkBlocked, debug) {
 								closeOnConfirm: false,
 								confirmButtonColor: "#DD6B55",
 								confirmButtonText: "Yes",
+								html: true,
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All messages will be deleted from your inbox.\n\nThis process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.",
+								text: "All messages will be deleted from your inbox.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-dam-retrieving\" style=\"font-weight:bold;display:none;\"><br /><br />Retrieving <span id=\"nt-dam-retrieving-text\">conversation list</span>...</strong><strong id=\"nt-dam-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-dam-progress-current\">0</span> of <span id=\"nt-dam-progress-total\">0</span> message(s) remaining...</strong>",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -109,7 +110,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 											swal({
 												allowOutsideClick: true,
-												text: "Something went wrong while trying to fetch initial data.",
+												text: "Something went wrong while trying to fetch the total amount of messages.",
 												title: err.status+" - "+err.statusText,
 												timer: 5000,
 												type: "error",
@@ -128,6 +129,9 @@ function Init(friendMessage, checkBlocked, debug) {
 											};
 
 											if (data.Total > 0) {
+												$('#nt-dam-progress-current').text(data.Total);
+												$('#nt-dam-progress-total').text(data.Total);
+												$('#nt-dam-retrieving').show()
 												RetrieveAllMessageUsers([]);
 											} else {
 												swal({
@@ -169,9 +173,10 @@ function Init(friendMessage, checkBlocked, debug) {
 								closeOnConfirm: false,
 								confirmButtonColor: "#DD6B55",
 								confirmButtonText: "Yes",
+								html: true,
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All friend requests you have received will be rejected.\n\nThis process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.",
+								text: "All friend requests you have received will be rejected.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-raf-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-raf-progress-current\">0</span> of <span id=\"nt-raf-progress-total\">0</span> friend request(s) remaining...</strong>",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -199,7 +204,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 											swal({
 												allowOutsideClick: true,
-												text: "Something went wrong while trying to fetch initial data.",
+												text: "Something went wrong while trying to fetch the total amount of friend requests.",
 												title: err.status+" - "+err.statusText,
 												timer: 5000,
 												type: "error",
@@ -218,6 +223,10 @@ function Init(friendMessage, checkBlocked, debug) {
 											} 
 
 											if (data.Status == true && data.TotalCount > 0) {
+												$('#nt-raf-progress-current').text(data.TotalCount);
+												$('#nt-raf-progress-total').text(data.TotalCount);
+												$('#nt-raf-progress').show();
+
 												data.RockstarAccounts.forEach(function(e) {
 													children.push(e);
 												});
@@ -236,7 +245,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											} else {
 												swal({
 													allowOutsideClick: true,
-													text: "Something went wrong while trying to fetch initial data.",
+													text: "Something went wrong while trying to fetch friend request data.",
 													title: "Something went wrong",
 													timer: 5000,
 													type: "error",
@@ -273,9 +282,10 @@ function Init(friendMessage, checkBlocked, debug) {
 								closeOnConfirm: false,
 								confirmButtonColor: "#DD6B55",
 								confirmButtonText: "Yes",
+								html: true,
 								showCancelButton: true,
 								showLoaderOnConfirm: true,
-								text: "All friends will be removed from your friend list.\n\nThis process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.",
+								text: "All friends will be removed from your friend list.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-daf-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-daf-progress-current\">0</span> of <span id=\"nt-daf-progress-total\">0</span> friend(s) remaining...</strong>",
 								title: "Are you sure?",
 								type: "warning",
 							},
@@ -301,7 +311,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 											swal({
 												allowOutsideClick: true,
-												text: "Something went wrong while trying to fetch initial data.",
+												text: "Something went wrong while trying to fetch the total amount of friends.",
 												title: err.status+" - "+err.statusText,
 												timer: 5000,
 												type: "error",
@@ -320,6 +330,10 @@ function Init(friendMessage, checkBlocked, debug) {
 											} 
 
 											if (data.Status == true && data.TotalCount > 0) {
+												$('#nt-daf-progress-current').text(data.TotalCount);
+												$('#nt-daf-progress-total').text(data.TotalCount);
+												$('#nt-daf-progress').show();
+
 												RetrieveAllFriends([]);
 											} else if (data.Status == true && data.TotalCount == 0) {
 												swal({
@@ -332,7 +346,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											} else {
 												swal({
 													allowOutsideClick: true,
-													text: "Something went wrong while trying to fetch initial data.",
+													text: "Something went wrong while trying to fetch friend data.",
 													title: "Something went wrong",
 													timer: 5000,
 													type: "error",
@@ -489,7 +503,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 										swal({
 											allowOutsideClick: true,
-											text: "Something went wrong while trying to fetch conversation data.",
+											text: "Something went wrong while trying to fetch the conversation list.",
 											title: err.status+" - "+err.statusText,
 											timer: 5000,
 											type: "error",
@@ -515,6 +529,8 @@ function Init(friendMessage, checkBlocked, debug) {
 											RetrieveAllMessageUsers(source, data.NextPageIndex);
 										} else {
 											if (debug) console.log("RetrieveAllMessageUsers() complete.");
+
+											$('#nt-dam-retrieving-text').text("messages");
 
 											RetrieveAllMessages(source);
 										}
@@ -570,6 +586,9 @@ function Init(friendMessage, checkBlocked, debug) {
 										} else if (target.length > 0) {
 											if (debug) console.log("RetrieveAllMessages() complete.");
 
+											$('#nt-dam-retrieving').hide();
+											$('#nt-dam-progress').show();
+
 											RemoveMessage(target);
 										}
 									},
@@ -591,6 +610,9 @@ function Init(friendMessage, checkBlocked, debug) {
 											RetrieveAllMessages(source, target);
 										} else if (target.length > 0) {
 											if (debug) console.log("RetrieveAllMessages() complete.");
+
+											$('#nt-dam-retrieving').hide();
+											$('#nt-dam-progress').show();
 
 											RemoveMessage(target);
 										}
@@ -648,6 +670,8 @@ function Init(friendMessage, checkBlocked, debug) {
 										}
 
 										if (source.length > 0) {
+											$('#nt-dam-progress-current').text(source.length);
+
 											RemoveMessage(source);
 										} else {
 											swal({
@@ -694,6 +718,8 @@ function Init(friendMessage, checkBlocked, debug) {
 										}
 
 										if (source.length > 0) {
+											$('#nt-dam-progress-current').text(source.length);
+
 											RemoveMessage(source);
 										} else {
 											swal({
@@ -839,6 +865,34 @@ function Init(friendMessage, checkBlocked, debug) {
 											};
 
 											console.error("Your friend " + item.Name + " could not be removed. ("+err.status+" - "+err.statusText+")");
+
+											if (source.length > 0) {
+												if (isFriendRequestLoop) {
+													$('#nt-raf-progress-current').text(source.length);
+												} else {
+													$('#nt-daf-progress-current').text(source.length);
+												}
+
+												RemoveFriend(source);
+											} else {
+												if (isFriendRequestLoop) {
+													swal({
+														allowOutsideClick: true,
+														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+														title: "Friend requests rejected",
+														timer: 5000,
+														type: "success",
+													});
+												} else {
+													swal({
+														allowOutsideClick: true,
+														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+														title: "Friends removed",
+														timer: 5000,
+														type: "success",
+													});
+												}
+											}
 										},
 										success: function(data){
 											if (debug) {
@@ -859,6 +913,12 @@ function Init(friendMessage, checkBlocked, debug) {
 											}
 
 											if (source.length > 0) {
+												if (isFriendRequestLoop) {
+													$('#nt-raf-progress-current').text(source.length);
+												} else {
+													$('#nt-daf-progress-current').text(source.length);
+												}
+
 												RemoveFriend(source);
 											} else {
 												if (isFriendRequestLoop) {
@@ -914,6 +974,34 @@ function Init(friendMessage, checkBlocked, debug) {
 											};
 
 											console.error("The friend request you sent to " + item.Name + " could not be cancelled. ("+err.status+" - "+err.statusText+")");
+
+											if (source.length > 0) {
+												if (isFriendRequestLoop) {
+													$('#nt-raf-progress-current').text(source.length);
+												} else {
+													$('#nt-daf-progress-current').text(source.length);
+												}
+
+												RemoveFriend(source);
+											} else {
+												if (isFriendRequestLoop) {
+													swal({
+														allowOutsideClick: true,
+														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+														title: "Friend requests rejected",
+														timer: 5000,
+														type: "success",
+													});
+												} else {
+													swal({
+														allowOutsideClick: true,
+														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+														title: "Friends removed",
+														timer: 5000,
+														type: "success",
+													});
+												}
+											}
 										},
 										success: function(data){
 											if (debug) {
@@ -934,6 +1022,12 @@ function Init(friendMessage, checkBlocked, debug) {
 											}
 
 											if (source.length > 0) {
+												if (isFriendRequestLoop) {
+													$('#nt-raf-progress-current').text(source.length);
+												} else {
+													$('#nt-daf-progress-current').text(source.length);
+												}
+
 												RemoveFriend(source);
 											} else {
 												if (isFriendRequestLoop) {
@@ -989,6 +1083,34 @@ function Init(friendMessage, checkBlocked, debug) {
 											};
 
 											console.error("The friend request you received from " + item.Name + " could not be rejected. ("+err.status+" - "+err.statusText+")");
+
+											if (source.length > 0) {
+												if (isFriendRequestLoop) {
+													$('#nt-raf-progress-current').text(source.length);
+												} else {
+													$('#nt-daf-progress-current').text(source.length);
+												}
+
+												RemoveFriend(source);
+											} else {
+												if (isFriendRequestLoop) {
+													swal({
+														allowOutsideClick: true,
+														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+														title: "Friend requests rejected",
+														timer: 5000,
+														type: "success",
+													});
+												} else {
+													swal({
+														allowOutsideClick: true,
+														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
+														title: "Friends removed",
+														timer: 5000,
+														type: "success",
+													});
+												}
+											}
 										},
 										success: function(data){
 											if (debug) {
@@ -1009,6 +1131,12 @@ function Init(friendMessage, checkBlocked, debug) {
 											}
 
 											if (source.length > 0) {
+												if (isFriendRequestLoop) {
+													$('#nt-raf-progress-current').text(source.length);
+												} else {
+													$('#nt-daf-progress-current').text(source.length);
+												}
+
 												RemoveFriend(source);
 											} else {
 												if (isFriendRequestLoop) {
@@ -1046,6 +1174,12 @@ function Init(friendMessage, checkBlocked, debug) {
 									console.warn("The user " + item.Name + " has been skipped (reason: type \""+item.Relationship+"\" not supported).");
 
 									if (source.length > 0) {
+										if (isFriendRequestLoop) {
+											$('#nt-raf-progress-current').text(source.length);
+										} else {
+											$('#nt-daf-progress-current').text(source.length);
+										}
+
 										RemoveFriend(source);
 									} else {
 										if (isFriendRequestLoop) {
