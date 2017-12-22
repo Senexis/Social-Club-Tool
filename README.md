@@ -19,6 +19,8 @@ To use, add the following as the URL of a bookmark, then click it!
 javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/1de75f4f0bc818da8f0297abaa203493bf5c9e5b/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){Init("",1,0)},1e3);})();
 ```
 
+*Last updated: December 22nd, 2017.*
+
 ## Customization
 To customize the social tool by enabling some additional features, you can edit the `Init()` part of the bookmark. Please refrain from customizing the tool if you don't have clue what any of this means. To see what parameter does what, please see the table below.
 
