@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = "1.1";
+	const APP_VERSION = "1.1.1";
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_AUTHOR = "Senexys";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
@@ -57,17 +57,17 @@ function Init(friendMessage, checkBlocked, debug) {
 
 				if (userNickname != "" && isLoggedIn) {
 					// Remove elements if they exist already.
-					if (document.getElementById("nt-qa")) $("#nt-qa").remove();
-					if (document.getElementById("nt-raf")) $("#nt-raf").remove();
-					if (document.getElementById("nt-daf")) $("#nt-daf").remove();
 					if (document.getElementById("nt-dam")) $("#nt-dam").remove();
+					if (document.getElementById("nt-daf")) $("#nt-daf").remove();
+					if (document.getElementById("nt-raf")) $("#nt-raf").remove();
+					if (document.getElementById("nt-qa")) $("#nt-qa").remove();
 					if (document.getElementById("nt-cred")) $("#nt-cred").remove();
 
 					// Add elements to the DOM.
-					$('<a id="nt-qa" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
-					$('<a id="nt-raf" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
-					$('<a id="nt-daf" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
 					$('<a id="nt-dam" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
+					$('<a id="nt-daf" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
+					$('<a id="nt-raf" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
+					$('<a id="nt-qa" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
 					$('<li id="nt-cred"><a href="'+APP_LINK+'" target="_blank">'+APP_NAME+' v'+APP_VERSION+'</a> by '+APP_AUTHOR+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 
 					// Add click listeners to the different elements.
@@ -1401,11 +1401,11 @@ function Init(friendMessage, checkBlocked, debug) {
 
 					$.getJSON("https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback")
 						.success(function(json) {
-							if (json[0].version != APP_VERSION && json[0].released) {
+							if (json.version != APP_VERSION && json.released) {
 								swal({
 									allowOutsideClick: true,
 									html: true,
-									text: "<p style=\"margin-bottom:0.6em\">"+APP_NAME+" <strong style=\"font-weight:bold\">version "+json[0].version+"</strong> is now available!</p><p style=\"margin-bottom:0.6em\">It was released on "+json[0].date+" and contains the following changes:</p><ul style=\"list-style:initial\"><li>"+json[0].changes.replace('|', '</li><li>')+"</li></ul><p style=\"margin:0.6em 0\">Update your bookmark to the following:</p><textarea style=\"padding:0.5em;width:100%;height:7em;border:solid 2px #f90;text-align:center\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var mtjs=document.createElement(\"script\");mtjs.id=\"nt-mtjs\",mtjs.src=\""+json[0].link+"\",document.getElementsByTagName(\"head\")[0].appendChild(mtjs)}setTimeout(function(){Init(\""+friendMessage+"\","+checkBlocked+","+debug+")},1e3);})();</textarea>",
+									text: "<p style=\"margin-bottom:0.6em\">"+APP_NAME+" <strong style=\"font-weight:bold\">version "+json.version+"</strong> is now available!</p><p style=\"margin-bottom:0.6em\">It was released on "+json.date+" and contains the following changes:</p><ul style=\"list-style:initial\"><li>"+json.changes.replace('|', '</li><li>')+"</li></ul><p style=\"margin:0.6em 0\">Update your bookmark to the following:</p><textarea style=\"padding:0.5em;width:100%;height:7em;border:solid 2px #f90;text-align:center\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var mtjs=document.createElement(\"script\");mtjs.id=\"nt-mtjs\",mtjs.src=\""+json.link+"\",document.getElementsByTagName(\"head\")[0].appendChild(mtjs)}setTimeout(function(){try{Init(\""+friendMessage+"\","+checkBlocked+","+debug+")}}catch(err){alert(\"Couldn't load Social Club Utility Tool in time, which sometimes happens when the connection is slow. Please click your bookmark again.\")},1e3);})();</textarea>",
 									title: "Update available!",
 									timer: 20000,
 									type: "warning"
