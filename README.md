@@ -1,5 +1,14 @@
 # Social Club Tool
 
+## Functionality
+
+This small tool provides you with some useful additional functionality Social Club itself does not yet offer:
+
+- **Quick-add Users**: Allows you to send friend request to entered Social Club IDs instantly.
+- **Delete All Friends**: Allows you to remove ALL friends instantly.
+- **Reject All Friend Requests**: Allows you to reject ALL friend requests instantly.
+- **Delete All Messages**: Allows you to remove ALL received and sent messages instantly.
+
 ## Usage
 
 To use, add the following as the URL of a bookmark, then click it!
