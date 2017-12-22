@@ -54,10 +54,10 @@ function Init(friendMessage, checkBlocked, debug) {
 
 				if (userNickname != "" && isLoggedIn) {
 					if (!document.getElementById("nt-cred")) {
-						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane" target="_blank">Nadermane</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
+						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Senexis" target="_blank">Senexis</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 					} else {
 						$("#nt-cred").remove();
-						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Nadermane" target="_blank">Nadermane</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
+						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Senexis" target="_blank">Senexis</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 						isReloaded = true;
 						if (debug) console.log("#nt-cred was already present.");
 					}
@@ -86,7 +86,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								showLoaderOnConfirm: true,
 								text: "All messages will be deleted from your inbox.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-dam-retrieving\" style=\"font-weight:bold;display:none;\"><br /><br />Retrieving <span id=\"nt-dam-retrieving-text\">conversation list</span>...</strong><strong id=\"nt-dam-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-dam-progress-current\">0</span> of <span id=\"nt-dam-progress-total\">0</span> message(s) remaining...</strong>",
 								title: "Are you sure?",
-								type: "warning",
+								type: "warning"
 							},
 							function(isConfirm){
 								if (isConfirm) {
@@ -113,8 +113,8 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "Something went wrong while trying to fetch the total amount of messages.",
 												title: err.status+" - "+err.statusText,
 												timer: 5000,
-												type: "error",
-											});	
+												type: "error"
+											}); 
 										},
 										success: function(data){
 											if (debug) {
@@ -139,8 +139,8 @@ function Init(friendMessage, checkBlocked, debug) {
 													text: "There were no messages to delete.",
 													title: "No messages",
 													timer: 5000,
-													type: "success",
-												});	
+													type: "success"
+												}); 
 											}
 										}
 									});
@@ -178,7 +178,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								showLoaderOnConfirm: true,
 								text: "All friend requests you have received will be rejected.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-raf-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-raf-progress-current\">0</span> of <span id=\"nt-raf-progress-total\">0</span> friend request(s) remaining...</strong>",
 								title: "Are you sure?",
-								type: "warning",
+								type: "warning"
 							},
 							function(isConfirm){
 								if (isConfirm) {
@@ -207,7 +207,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "Something went wrong while trying to fetch the total amount of friend requests.",
 												title: err.status+" - "+err.statusText,
 												timer: 5000,
-												type: "error",
+												type: "error"
 											});
 										},
 										success: function(data){
@@ -240,7 +240,7 @@ function Init(friendMessage, checkBlocked, debug) {
 													text: "There were no friend requests to reject.",
 													title: "No friend requests",
 													timer: 5000,
-													type: "success",
+													type: "success"
 												});
 											} else {
 												swal({
@@ -248,7 +248,7 @@ function Init(friendMessage, checkBlocked, debug) {
 													text: "Something went wrong while trying to fetch friend request data.",
 													title: "Something went wrong",
 													timer: 5000,
-													type: "error",
+													type: "error"
 												});
 											}
 										}
@@ -287,7 +287,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								showLoaderOnConfirm: true,
 								text: "All friends will be removed from your friend list.<br /><br />This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.<strong id=\"nt-daf-retrieving\" style=\"font-weight:bold;display:none;\"><br /><br />Retrieving friends...</strong><strong id=\"nt-daf-progress\" style=\"font-weight:bold;display:none;\"><br /><br /><span id=\"nt-daf-progress-current\">0</span> of <span id=\"nt-daf-progress-total\">0</span> friend(s) remaining...</strong>",
 								title: "Are you sure?",
-								type: "warning",
+								type: "warning"
 							},
 							function(isConfirm){
 								if (isConfirm) {
@@ -314,7 +314,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "Something went wrong while trying to fetch the total amount of friends.",
 												title: err.status+" - "+err.statusText,
 												timer: 5000,
-												type: "error",
+												type: "error"
 											});
 										},
 										success: function(data){
@@ -341,7 +341,7 @@ function Init(friendMessage, checkBlocked, debug) {
 													text: "There were no friends to delete.",
 													title: "No friends",
 													timer: 5000,
-													type: "success",
+													type: "success"
 												});
 											} else {
 												swal({
@@ -349,7 +349,7 @@ function Init(friendMessage, checkBlocked, debug) {
 													text: "Something went wrong while trying to fetch friend data.",
 													title: "Something went wrong",
 													timer: 5000,
-													type: "error",
+													type: "error"
 												});
 											}
 										}
@@ -439,7 +439,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											text: 'Something went wrong while trying to check whether "'+inputValue.trim()+'" exists or not.',
 											title: err.status+" - "+err.statusText,
 											timer: 5000,
-											type: "error",
+											type: "error"
 										});
 									},
 									success: function(data){
@@ -466,7 +466,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: 'The nickname "'+inputValue+'" doesn\'t exist.',
 												title: "User not found",
 												timer: 5000,
-												type: "warning",
+												type: "warning"
 											});
 										}
 									}
@@ -506,7 +506,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											text: "Something went wrong while trying to fetch the conversation list.",
 											title: err.status+" - "+err.statusText,
 											timer: 5000,
-											type: "error",
+											type: "error"
 										});
 									},
 									success: function(data){
@@ -679,7 +679,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "All of the messages in your inbox should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.",
 												title: "Messages removed",
 												timer: 5000,
-												type: "success",
+												type: "success"
 											});
 										}
 									},
@@ -727,7 +727,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "All of the messages in your inbox should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.",
 												title: "Messages removed",
 												timer: 5000,
-												type: "success",
+												type: "success"
 											});
 										}
 									},
@@ -778,7 +778,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											text: "Something went wrong while trying to fetch data from page "+pageIndex+".",
 											title: err.status+" - "+err.statusText,
 											timer: 5000,
-											type: "error",
+											type: "error"
 										});
 									},
 									success: function(data){
@@ -803,7 +803,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "Something went wrong while trying to fetch data from page "+pageIndex+".",
 												title: "Something went wrong",
 												timer: 5000,
-												type: "error",
+												type: "error"
 											});
 										}
 
@@ -884,7 +884,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friend requests rejected",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												} else {
 													swal({
@@ -892,7 +892,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friends removed",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												}
 											}
@@ -930,7 +930,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friend requests rejected",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												} else {
 													swal({
@@ -938,7 +938,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friends removed",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												}
 											}
@@ -993,7 +993,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friend requests rejected",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												} else {
 													swal({
@@ -1001,7 +1001,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friends removed",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												}
 											}
@@ -1039,7 +1039,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friend requests rejected",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												} else {
 													swal({
@@ -1047,7 +1047,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friends removed",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												}
 											}
@@ -1102,7 +1102,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friend requests rejected",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												} else {
 													swal({
@@ -1110,7 +1110,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friends removed",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												}
 											}
@@ -1148,7 +1148,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friend requests rejected",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												} else {
 													swal({
@@ -1156,7 +1156,7 @@ function Init(friendMessage, checkBlocked, debug) {
 														text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 														title: "Friends removed",
 														timer: 5000,
-														type: "success",
+														type: "success"
 													});
 												}
 											}
@@ -1191,7 +1191,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "All friend requests you received should have been rejected.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 												title: "Friend requests rejected",
 												timer: 5000,
-												type: "success",
+												type: "success"
 											});
 										} else {
 											swal({
@@ -1199,7 +1199,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "All your friends should have been removed.\n\nYou can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.",
 												title: "Friends removed",
 												timer: 5000,
-												type: "success",
+												type: "success"
 											});
 										}
 									}
@@ -1239,7 +1239,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											text: "Something went wrong while trying to retrieve blocked users.",
 											title: err.status+" - "+err.statusText,
 											timer: 5000,
-											type: "error",
+											type: "error"
 										});
 									},
 									success: function(data){
@@ -1271,7 +1271,7 @@ function Init(friendMessage, checkBlocked, debug) {
 													text: source.Nickname+" is on your blocked users list. To be able to send them a friend request, remove them from your blocked users list, then try again.",
 													title: "User blocked",
 													timer: 5000,
-													type: "warning",
+													type: "warning"
 												});
 											}
 										} else {
@@ -1280,7 +1280,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												text: "Something went wrong while trying to retrieve blocked users.",
 												title: "Something went wrong",
 												timer: 5000,
-												type: "error",
+												type: "error"
 											});
 										}
 									}
@@ -1319,7 +1319,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										text: 'Something went wrong trying to add "' + source.Nickname + '".',
 										title: err.status+" - "+err.statusText,
 										timer: 5000,
-										type: "error",
+										type: "error"
 									});
 								},
 								success: function(data){
@@ -1340,7 +1340,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											text: 'A friend request has been sent to "' + source.Nickname + '".\n\nTo view the changes to your friends list, please refresh the page.',
 											title: "User added",
 											timer: 5000,
-											type: "success",
+											type: "success"
 										});
 									} else {
 										swal({
@@ -1348,7 +1348,7 @@ function Init(friendMessage, checkBlocked, debug) {
 											text: 'Something went wrong trying to add "' + source.Nickname + '".',
 											title: "Something went wrong",
 											timer: 5000,
-											type: "error",
+											type: "error"
 										});
 									}
 								},
@@ -1370,7 +1370,13 @@ function Init(friendMessage, checkBlocked, debug) {
 						}
 					}
 
-					console.info("The Social Club tool was "+(isReloaded ? "re" : "")+"loaded successfully.");
+					swal({
+						allowOutsideClick: true,
+						text: "The Social Club tool was "+(isReloaded ? "re" : "")+"loaded successfully!",
+						title: "Loaded",
+						timer: 3000,
+						type: "success"
+					});
 				} else {
 					swal({
 						allowOutsideClick: true,
@@ -1380,7 +1386,14 @@ function Init(friendMessage, checkBlocked, debug) {
 					});
 				}
 			} catch (err) {
-				console.error("Uncaught exception:\n\n"+err.stack);
+				swal({
+					allowOutsideClick: true,
+					text: "Sorry, something went wrong and the Social Club Tool was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please submit an issue at GitHub.",
+					title: "An error occured",
+					type: "error",
+					timer: 3000
+				});
+				if (debug) console.error("Uncaught exception:\n\n"+err.stack);
 				return;
 			}
 		} else {
