@@ -1399,28 +1399,26 @@ function Init(friendMessage, checkBlocked, debug) {
 						}
 					}
 
-					$.getJSON("https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback")
-						.success(function(json) {
-							if (json.version != APP_VERSION && json.released) {
-								swal({
-									allowOutsideClick: true,
-									html: true,
-									text: "<p style=\"margin-bottom:0.6em\">"+APP_NAME+" <strong style=\"font-weight:bold\">version "+json.version+"</strong> is now available!</p><p style=\"margin-bottom:0.6em\">It was released on "+json.date+" and contains the following changes:</p><ul style=\"list-style:initial\"><li>"+json.changes.replace('|', '</li><li>')+"</li></ul><p style=\"margin:0.6em 0\">Update your bookmark to the following:</p><textarea style=\"padding:0.5em;width:100%;height:7em;border:solid 2px #f90;text-align:center\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var mtjs=document.createElement(\"script\");mtjs.id=\"nt-mtjs\",mtjs.src=\""+json.link+"\",document.getElementsByTagName(\"head\")[0].appendChild(mtjs)}setTimeout(function(){try{Init(\""+friendMessage+"\","+checkBlocked+","+debug+")}}catch(err){alert(\"Couldn't load Social Club Utility Tool in time, which sometimes happens when the connection is slow. Please click your bookmark again.\")},1e3);})();</textarea>",
-									title: "Update available!",
-									timer: 20000,
-									type: "warning"
-								});
-							} else {
-								swal({
-									allowOutsideClick: true,
-									text: APP_NAME + " was loaded successfully!",
-									title: "Loaded",
-									timer: 3000,
-									type: "success"
-								});
-							}
-						})
-						.error(function() {
+					$.getJSON("https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback", function(json) {
+						if (debug) {
+							console.groupCollapsed("Update retrieval OK");
+							console.group("Response");
+							console.log(json);
+							console.groupEnd();
+							console.groupEnd();
+						}
+					})
+					.success(function(json) {
+						if (json.version != APP_VERSION && json.released) {
+							swal({
+								allowOutsideClick: true,
+								html: true,
+								text: "<p style=\"margin-bottom:0.6em\">"+APP_NAME+" <strong style=\"font-weight:bold\">version "+json.version+"</strong> is now available!</p><p style=\"margin-bottom:0.6em\">It was released on "+json.date+" and contains the following changes:</p><ul style=\"list-style:initial\"><li>"+json.changes.replace('|', '</li><li>')+"</li></ul><p style=\"margin:0.6em 0\">Update your bookmark to the following:</p><textarea style=\"padding:0.5em;width:100%;height:7em;border:solid 2px #f90;text-align:center\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var mtjs=document.createElement(\"script\");mtjs.id=\"nt-mtjs\",mtjs.src=\""+json.link+"\",document.getElementsByTagName(\"head\")[0].appendChild(mtjs)}setTimeout(function(){try{Init(\""+friendMessage+"\","+checkBlocked+","+debug+")}}catch(err){alert(\"Couldn't load Social Club Utility Tool in time, which sometimes happens when the connection is slow. Please click your bookmark again.\")},1e3);})();</textarea>",
+								title: "Update available!",
+								timer: 20000,
+								type: "warning"
+							});
+						} else {
 							swal({
 								allowOutsideClick: true,
 								text: APP_NAME + " was loaded successfully!",
@@ -1428,7 +1426,23 @@ function Init(friendMessage, checkBlocked, debug) {
 								timer: 3000,
 								type: "success"
 							});
+						}
+					})
+					.error(function(err) {
+						swal({
+							allowOutsideClick: true,
+							text: APP_NAME + " was loaded successfully!",
+							title: "Loaded",
+							timer: 3000,
+							type: "success"
 						});
+
+						if (debug) {
+							console.groupCollapsed("Update retrieval FAIL");
+							console.error(err);
+							console.groupEnd();
+						}
+					});
 
 				} else {
 					swal({
