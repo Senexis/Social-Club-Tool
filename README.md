@@ -16,7 +16,7 @@ To use, add the following as the URL of a bookmark, then click it!
 **Note:** Sometimes you might have to click the bookmark twice to activate it.
 
 ```
-javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/73fb07dd5ac38898aa25948dcf9389526b893f01/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){Init("",1,0)},1e3);})();
+javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/73fb07dd5ac38898aa25948dcf9389526b893f01/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){try{Init("",1,0)}catch(err){alert("Couldn't load Social Club Utility Tool by Senexis in time, which sometimes happens when the connection is slow. Please click your bookmark again.")}},1e3);})();
 ```
 
 *Last updated: December 22nd, 2017.*
