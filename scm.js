@@ -1,76 +1,76 @@
 function Init(friendMessage, checkBlocked, debug) {
+	const APP_VERSION = "1.1";
+	const APP_NAME = "Social Club Utility Tool";
+	const APP_AUTHOR = "Senexys";
+	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
+	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
+	const APP_LINK_UPDATE = "https://github.com/Senexis/Social-Club-Tool/#usage";
+	const APP_LINK_VERSIONS = "https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback";
+	const APP_LINK_SC = "https://socialclub.rockstargames.com";
+
 	if (friendMessage === undefined) friendMessage = "";
 	if (checkBlocked === undefined) checkBlocked = true;
 	if (debug === undefined) debug = false;
-	var isReloaded = false;
 
 	try {
-		if (!document.getElementById("nt-jqjs")) {
-			var jqjs = document.createElement('script');
-			jqjs.id = "nt-jqjs";
-			jqjs.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js";
-			document.getElementsByTagName('head')[0].appendChild(jqjs);
-		} else {
-			isReloaded = true;
-			if (debug) console.log("jQuery JS was already present.");
-		}
+		var jqjs = document.createElement('script');
+		jqjs.id = "nt-jqjs";
+		jqjs.src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/1.6.4/jquery.min.js";
+		document.getElementsByTagName('head')[0].appendChild(jqjs);
 
-		if (!document.getElementById("nt-sacss")) {
-			var sacss = document.createElement('link');
-			sacss.id = "nt-sacss";
-			sacss.rel = "stylesheet";
-			sacss.href = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css";
-			document.getElementsByTagName('head')[0].appendChild(sacss);
-		} else {
-			isReloaded = true;
-			if (debug) console.log("SweetAlert CSS was already present.");
-		}
+		var sacss = document.createElement('link');
+		sacss.id = "nt-sacss";
+		sacss.rel = "stylesheet";
+		sacss.href = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css";
+		document.getElementsByTagName('head')[0].appendChild(sacss);
 
-		if (!document.getElementById("nt-sajs")) {
-			var sajs = document.createElement('script');
-			sajs.id = "nt-sajs";
-			sajs.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
-			document.getElementsByTagName('head')[0].appendChild(sajs);
-		} else {
-			isReloaded = true;
-			if (debug) console.log("SweetAlert JS was already present.");
-		}
+		var sajs = document.createElement('script');
+		sajs.id = "nt-sajs";
+		sajs.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
+		document.getElementsByTagName('head')[0].appendChild(sajs);
 	} catch (err) {
-		console.error("Error during script loader:\n\n"+err.stack);
+		if (debug) {
+			console.groupCollapsed("Script loading FAIL");
+			console.error(err);
+			console.groupEnd();
+		}
+
 		return;
 	}
 
 	setTimeout(function () {
-		if (window.location.href.startsWith("https://socialclub.rockstargames.com/")) {
+		if (window.location.href.startsWith(APP_LINK_SC)) {
 			try {
 				try {
 					var verificationToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
 					var userNickname = siteMaster.authUserNickName;
 					var isLoggedIn = siteMaster.isLoggedIn;
 				} catch (err) {
-					console.error("Error retrieving account data:\n\n"+err.stack);
+					if (debug) {
+						console.groupCollapsed("Account data retrieval FAIL");
+						console.error(err);
+						console.groupEnd();
+					}
+
 					return;
 				}
 
 				if (userNickname != "" && isLoggedIn) {
-					if (!document.getElementById("nt-cred")) {
-						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Senexis" target="_blank">Senexis</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
-					} else {
-						$("#nt-cred").remove();
-						$('<li id="nt-cred">Social Club tool by <a href="https://github.com/Senexis" target="_blank">Senexis</a>'+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
-						isReloaded = true;
-						if (debug) console.log("#nt-cred was already present.");
-					}
+					// Remove elements if they exist already.
+					if (document.getElementById("nt-qa")) $("#nt-qa").remove();
+					if (document.getElementById("nt-raf")) $("#nt-raf").remove();
+					if (document.getElementById("nt-daf")) $("#nt-daf").remove();
+					if (document.getElementById("nt-dam")) $("#nt-dam").remove();
+					if (document.getElementById("nt-cred")) $("#nt-cred").remove();
 
-					if (!document.getElementById("nt-dam")) {
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
-					} else {
-						$("#nt-dam").remove();
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-dam" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
-						isReloaded = true;
-						if (debug) console.log("#nt-dam was already present.");
-					}
+					// Add elements to the DOM.
+					$('<a id="nt-qa" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
+					$('<a id="nt-raf" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
+					$('<a id="nt-daf" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
+					$('<a id="nt-dam" class="btn btnGold btnRounded" href="#" style="margin-bottom: 8px;margin-right: 5px;">delete all messages</a>').prependTo('#page');
+					$('<li id="nt-cred"><a href="'+APP_LINK+'" target="_blank">'+APP_NAME+' v'+APP_VERSION+'</a> by '+APP_AUTHOR+(debug ? " (debug mode)" : "")+'</li>').appendTo('#footerNav');
 
+					// Add click listeners to the different elements.
 					$("#nt-dam").click(function(e) {
 						e.preventDefault();
 
@@ -91,7 +91,7 @@ function Init(friendMessage, checkBlocked, debug) {
 							function(isConfirm){
 								if (isConfirm) {
 									$.ajax({
-										url: "https://socialclub.rockstargames.com/Message/GetMessageCount",
+										url: APP_LINK_SC + "/Message/GetMessageCount",
 										headers: {
 											"Accept": "application/json",
 											"RequestVerificationToken": verificationToken
@@ -149,19 +149,15 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							});
 						} catch (err) {
-							console.error("Error during #nt-dam.click():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("#nt-dam.click() FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					});
-
-					if (!document.getElementById("nt-raf")) {
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-raf" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
-					} else {
-						$("#nt-raf").remove();
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-raf" style="margin-bottom: 8px;margin-right: 5px;">reject all friend requests</a>').prependTo('#page');
-						isReloaded = true;
-						if (debug) console.log("#nt-raf was already present.");
-					}
 
 					$("#nt-raf").click(function(e) {
 						e.preventDefault();
@@ -185,7 +181,7 @@ function Init(friendMessage, checkBlocked, debug) {
 									var children = [];
 
 									$.ajax({
-										url: "https://socialclub.rockstargames.com/friends/GetReceivedInvitesJson",
+										url: APP_LINK_SC + "/friends/GetReceivedInvitesJson",
 										headers: {
 											"Accept": "application/json",
 											"RequestVerificationToken": verificationToken
@@ -258,19 +254,15 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							});
 						} catch (err) {
-							console.error("Error during #nt-raf.click():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("#nt-raf.click() FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					});
-
-					if (!document.getElementById("nt-daf")) {
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-daf" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
-					} else {
-						$("#nt-daf").remove();
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-daf" style="margin-bottom: 8px;margin-right: 5px;">delete all friends</a>').prependTo('#page');
-						isReloaded = true;
-						if (debug) console.log("#nt-daf was already present.");
-					}
 
 					$("#nt-daf").click(function(e) {
 						e.preventDefault();
@@ -292,7 +284,7 @@ function Init(friendMessage, checkBlocked, debug) {
 							function(isConfirm){
 								if (isConfirm) {
 									$.ajax({
-										url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber=0&onlineService=sc&pendingInvitesOnly=false",
+										url: APP_LINK_SC + "/friends/GetFriendsAndInvitesSentJson?pageNumber=0&onlineService=sc&pendingInvitesOnly=false",
 										headers: {
 											"Accept": "application/json",
 											"RequestVerificationToken": verificationToken
@@ -359,19 +351,15 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							});
 						} catch (err) {
-							console.error("Error during #nt-daf.click():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("#nt-daf.click() FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					});
-
-					if (!document.getElementById("nt-qa")) {
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-qa" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
-					} else {
-						$("#nt-qa").remove();
-						$('<a class="btn btnGold btnRounded" href="#" id="nt-qa" style="margin-bottom: 8px;margin-right: 5px;">quick-add user</a>').prependTo('#page');
-						isReloaded = true;
-						if (debug) console.log("#nt-qa was already present.");
-					}
 
 					$("#nt-qa").click(function(e) {
 						e.preventDefault();
@@ -417,7 +405,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 
 								$.ajax({
-									url: "https://socialclub.rockstargames.com/Friends/GetAccountDetails?nickname="+inputValue.trim()+"&full=false",
+									url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname="+inputValue.trim()+"&full=false",
 									headers: {
 										"Accept": "application/json",
 										"RequestVerificationToken": verificationToken
@@ -473,18 +461,24 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							});
 						} catch (err) {
-							console.error("Error during #nt-qa.click():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("#nt-qa.click() FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					});
 
+					// Utility functions.
 					function RetrieveAllMessageUsers(source, pageIndex) {
 						try {
 							if (pageIndex === undefined) pageIndex = 0;
 
 							setTimeout(function() {
 								$.ajax({
-									url: "https://socialclub.rockstargames.com/Message/GetConversationList?pageIndex="+pageIndex,
+									url: APP_LINK_SC + "/Message/GetConversationList?pageIndex="+pageIndex,
 									headers: {
 										"Accept": "application/json",
 										"RequestVerificationToken": verificationToken
@@ -538,7 +532,12 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							console.error("Error during RetrieveAllMessageUsers():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("RetrieveAllMessageUsers FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
@@ -564,7 +563,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								};
 
 								$.ajax({
-									url: "https://socialclub.rockstargames.com/Message/GetMessages?rockstarId="+item.RockstarId,
+									url: APP_LINK_SC + "/Message/GetMessages?rockstarId="+item.RockstarId,
 									headers: {
 										"Accept": "application/json",
 										"RequestVerificationToken": verificationToken
@@ -620,7 +619,12 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							console.error("Error during RetrieveAllMessages():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("RetrieveAllMessages FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
@@ -644,7 +648,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								};
 
 								$.ajax({
-									url: "https://socialclub.rockstargames.com/Message/DeleteMessage",
+									url: APP_LINK_SC + "/Message/DeleteMessage",
 									type: "POST",
 									data: '{"messageid":'+item.ID+',"isAdmin":'+item.IsAdminMessage+'}',
 									headers: {
@@ -745,7 +749,12 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							console.error("Error during RemoveMessage():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("RemoveMessage FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
@@ -756,7 +765,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 							setTimeout(function() {
 								$.ajax({
-									url: "https://socialclub.rockstargames.com/friends/GetFriendsAndInvitesSentJson?pageNumber="+pageIndex+"&onlineService=sc&pendingInvitesOnly=false",
+									url: APP_LINK_SC + "/friends/GetFriendsAndInvitesSentJson?pageNumber="+pageIndex+"&onlineService=sc&pendingInvitesOnly=false",
 									headers: {
 										"Accept": "application/json",
 										"RequestVerificationToken": verificationToken
@@ -821,7 +830,12 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							console.error("Error during RetrieveAllFriends():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("RetrieveAllFriends FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
@@ -848,7 +862,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 								if (item.AllowDelete === true) {
 									$.ajax({
-										url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+										url: APP_LINK_SC + "/friends/UpdateFriend",
 										type: "PUT",
 										data: '{"id":'+item.RockstarId+',"op":"delete"}',
 										headers: {
@@ -957,7 +971,7 @@ function Init(friendMessage, checkBlocked, debug) {
 									});
 								} else if (item.AllowCancel === true) {
 									$.ajax({
-										url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+										url: APP_LINK_SC + "/friends/UpdateFriend",
 										type: "PUT",
 										data: '{"id":'+item.RockstarId+',"op":"cancel"}',
 										headers: {
@@ -1066,7 +1080,7 @@ function Init(friendMessage, checkBlocked, debug) {
 									});
 								} else if (item.AllowAdd === true) {
 									$.ajax({
-										url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+										url: APP_LINK_SC + "/friends/UpdateFriend",
 										type: "PUT",
 										data: '{"id":'+item.RockstarId+',"op":"ignore"}',
 										headers: {
@@ -1206,7 +1220,12 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							}, 1000)
 						} catch (err) {
-							console.error("Error during RemoveFriend():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("RemoveFriend FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
@@ -1217,7 +1236,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 							setTimeout(function() {
 								$.ajax({
-									url: "https://socialclub.rockstargames.com/friends/GetBlockedJson",
+									url: APP_LINK_SC + "/friends/GetBlockedJson",
 									headers: {
 										"Accept": "application/json",
 										"RequestVerificationToken": verificationToken
@@ -1287,7 +1306,12 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							console.error("Error during RetrieveBlockedList():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("RetrieveBlockedList FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
@@ -1295,7 +1319,7 @@ function Init(friendMessage, checkBlocked, debug) {
 					function AddFriend(source) {
 						try {
 							$.ajax({
-								url: "https://socialclub.rockstargames.com/friends/UpdateFriend",
+								url: APP_LINK_SC + "/friends/UpdateFriend",
 								type: "PUT",
 								data: '{"id":'+source.RockstarId+',"op":"addfriend","custommessage":"'+friendMessage.trim().replace(/\s\s+/g, ' ')+'"}',
 								headers: {
@@ -1365,56 +1389,91 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							});
 						} catch (err) {
-							console.error("Error during AddFriend():\n\n"+err.stack);
+							if (debug) {
+								console.groupCollapsed("AddFriend FAIL");
+								console.error(err);
+								console.groupEnd();
+							}
+
 							return;
 						}
 					}
 
-					swal({
-						allowOutsideClick: true,
-						text: "The Social Club tool was "+(isReloaded ? "re" : "")+"loaded successfully!",
-						title: "Loaded",
-						timer: 3000,
-						type: "success"
-					});
+					$.getJSON("https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback")
+						.success(function(json) {
+							if (json[0].version != APP_VERSION && json[0].released) {
+								swal({
+									allowOutsideClick: true,
+									html: true,
+									text: "<p style=\"margin-bottom:0.6em\">"+APP_NAME+" <strong style=\"font-weight:bold\">version "+json[0].version+"</strong> is now available!</p><p style=\"margin-bottom:0.6em\">It was released on "+json[0].date+" and contains the following changes:</p><ul style=\"list-style:initial\"><li>"+json[0].changes.replace('|', '</li><li>')+"</li></ul><p style=\"margin:0.6em 0\">Update your bookmark to the following:</p><textarea style=\"padding:0.5em;width:100%;height:7em;border:solid 2px #f90;text-align:center\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var mtjs=document.createElement(\"script\");mtjs.id=\"nt-mtjs\",mtjs.src=\""+json[0].link+"\",document.getElementsByTagName(\"head\")[0].appendChild(mtjs)}setTimeout(function(){Init(\""+friendMessage+"\","+checkBlocked+","+debug+")},1e3);})();</textarea>",
+									title: "Update available!",
+									timer: 20000,
+									type: "warning"
+								});
+							} else {
+								swal({
+									allowOutsideClick: true,
+									text: APP_NAME + " was loaded successfully!",
+									title: "Loaded",
+									timer: 3000,
+									type: "success"
+								});
+							}
+						})
+						.error(function() {
+							swal({
+								allowOutsideClick: true,
+								text: APP_NAME + " was loaded successfully!",
+								title: "Loaded",
+								timer: 3000,
+								type: "success"
+							});
+						});
+
 				} else {
 					swal({
 						allowOutsideClick: true,
-						text: "The Social Club tool requires you to log in to be able to apply changes to your account. Please log into the account you want to use with the Social Club tool, then click the bookmark again.",
+						text: APP_NAME + " requires you to log in to be able to apply changes to your account. Please log into the account you want to use with "+APP_NAME+", then click the bookmark again.",
 						title: "Log in required",
 						type: "warning"
 					});
 				}
 			} catch (err) {
-				swal({
-					allowOutsideClick: true,
-					text: "Sorry, something went wrong and the Social Club Tool was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please submit an issue at GitHub.",
-					title: "An error occured",
-					type: "error",
-					timer: 3000
-				});
-				if (debug) console.error("Uncaught exception:\n\n"+err.stack);
+				if (err instanceof DOMException) {
+					swal({
+						allowOutsideClick: true,
+						html: true,
+						text: APP_NAME + " was not loaded correctly. Please try clicking the bookmark again without refreshing the page.",
+						title: "Load unsuccessful",
+						type: "error",
+					});
+				} else {
+					swal({
+						allowOutsideClick: true,
+						text: APP_NAME + " was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please <a href=\""+APP_LINK_ISSUES+"\" target=\"_blank\">submit an issue</a>.",
+						title: "An error occured",
+						type: "error"
+					});
+
+					if (debug) {
+						console.groupCollapsed("General FAIL");
+						console.error(err);
+						console.groupEnd();
+					};
+				}
 				return;
 			}
 		} else {
-			try {
-				swal({
-					allowOutsideClick: true,
-					cancelButtonText: "No",
-					closeOnConfirm: false,
-					confirmButtonText: "Yes",
-					showCancelButton: true,
-					text: "Whoops, you accidentally activated the Social Club tool on a wrong web page. To use the Social Club tool, first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club main page now?",
-					title: "Wrong site",
-					type: "warning"
-				},
-				function(){
-					window.location.href = "https://socialclub.rockstargames.com/";
-				});
-			} catch (err) {
-				console.error("Error during otherPage swal():\n\n"+err.stack);
-				return;
-			}
+			swal({
+				allowOutsideClick: true,
+				cancelButtonText: "No",
+				closeOnConfirm: false,
+				confirmButtonText: "Yes",
+				showCancelButton: true,
+				text: "Whoops, you accidentally activated "+APP_NAME+" on a wrong web page. To use "+APP_NAME+", first browse to the correct page, then click the bookmark again.\n\nDo you want to go to the Social Club main page now?",
+				title: "Wrong site",
+				type: "warning"
+			}, function(){ window.location.href = APP_LINK_SC });
 		}
 	}, 1000);
 }
