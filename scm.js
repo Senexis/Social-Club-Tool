@@ -349,12 +349,12 @@ function Init(friendMessage, checkBlocked, debug) {
 							swal({
 								type: "input",
 								title: "Enter username",
-								html: true,
 								text: '<p>Please enter the Social Club username you want to add. When you click "Add", the user will automatically be added if it exists.</p>'+(checkBlocked ? "" : "<p><strong>Note:</strong> You have disabled the blocked users list check. If the user is on your blocked users list, they will be unblocked and sent a friend request.</p>")+(friendMessage == "" ? "" : "<p><strong>Note:</strong> You have set a custom friend request message, which will get sent to the user.</p>"),
 
 								allowEscapeKey: false,
 								closeOnConfirm: false,
 								confirmButtonText: "Add",
+								html: true,
 								inputPlaceholder: "Social Club username",
 								showCancelButton: true,
 								showLoaderOnConfirm: true
@@ -409,23 +409,33 @@ function Init(friendMessage, checkBlocked, debug) {
 										logRequest("GetAccountDetails AJAX OK", this, data);
 
 										if (data.Status == true) {
-											if (data.AllowAddFriend == true) {
-												if (checkBlocked) {
-													RetrieveBlockedList(data);
-												} else {
-													AddFriend(data);
-												}
+											if (data.Relation == "Friend") {
+												swal(
+													getTimedSwalArgs(
+														"success",
+														"Already added",
+														"<strong>" + inputValue + "</strong> is already your friend."
+													)
+												);
 											} else {
-												if (data.AllowAcceptFriend == true) {
-													AcceptFriend(data);
+												if (data.AllowAddFriend == true) {
+													if (checkBlocked) {
+														RetrieveBlockedList(data);
+													} else {
+														AddFriend(data);
+													}
 												} else {
-													swal(
-														getTimedSwalArgs(
-															"error",
-															"Can't send request",
-															"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
-														)
-													);
+													if (data.AllowAcceptFriend == true) {
+														AcceptFriend(data);
+													} else {
+														swal(
+															getTimedSwalArgs(
+																"error",
+																"Can't send request",
+																"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
+															)
+														);
+													}
 												}
 											}
 										} else {
@@ -1284,13 +1294,13 @@ function Init(friendMessage, checkBlocked, debug) {
 				{
 					type: "warning",
 					title: "Wrong site",
-					html: true,
 					text: "<p>Whoops, you accidentally activated "+APP_NAME+" on a wrong web page. To use "+APP_NAME+", first browse to the Social Club website, then click the bookmark again.</p><p>Do you want to go to the Social Club website now?</p>",
 
 					allowOutsideClick: true,
 					cancelButtonText: "No",
 					closeOnConfirm: false,
 					confirmButtonText: "Yes",
+					html: true,
 					showCancelButton: true
 				},
 				function () {
