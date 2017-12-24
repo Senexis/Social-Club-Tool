@@ -16,10 +16,10 @@ To use, add the following as the URL of a bookmark, then click it!
 **Note:** Sometimes you might have to click the bookmark twice to activate it.
 
 ```
-javascript:(function(){if(!document.getElementById("nt-mtjs")){var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/237a7c8133f73957a162d1da8183dbbe883bc752/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function(){try{Init("",1,0)}catch(err){alert("Couldn't load Social Club Utility Tool by Senexis in time, which sometimes happens when the connection is slow. Please click your bookmark again.")}},1e3);})();
+javascript:(function () {if(!document.getElementById("nt-mtjs")) {var mtjs=document.createElement("script");mtjs.id="nt-mtjs",mtjs.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/0f706c4e896761d29ccc5e40b8a58247c470dd07/scm.js",document.getElementsByTagName("head")[0].appendChild(mtjs)}setTimeout(function () {try{Init("HI!'",0)}}catch(err) {alert("Social Club Utility Tool loading failed: Please try clicking your bookmark again.")},1e3);})();
 ```
 
-*Last updated: December 22nd, 2017.*
+*Last updated: December 24th, 2017.*
 
 ## Customization
 To customize the social tool by enabling some additional features, you can edit the `Init()` part of the bookmark. Please refrain from customizing the tool if you don't have clue what any of this means. To see what parameter does what, please see the table below.
