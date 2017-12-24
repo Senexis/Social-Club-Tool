@@ -409,15 +409,29 @@ function Init(friendMessage, checkBlocked, debug) {
 										logRequest("GetAccountDetails AJAX OK", this, data);
 
 										if (data.Status == true) {
-											if (checkBlocked) {
-												RetrieveBlockedList(data);
+											if (data.AllowAddFriend == true) {
+												if (checkBlocked) {
+													RetrieveBlockedList(data);
+												} else {
+													AddFriend(data);
+												}
 											} else {
-												AddFriend(data);
+												if (data.AllowAcceptFriend == true) {
+													AcceptFriend(data);
+												} else {
+													swal(
+														getTimedSwalArgs(
+															"error",
+															"Can't send request",
+															"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
+														)
+													);
+												}
 											}
 										} else {
 											swal(
 												getTimedSwalArgs(
-													"warning",
+													"error",
 													"User not found",
 													"The nickname <strong>" + inputValue + "</strong> doesn't exist."
 												)
@@ -1124,6 +1138,66 @@ function Init(friendMessage, checkBlocked, debug) {
 							});
 						} catch (err) {
 							logError("AddFriend FAIL", err);
+							return;
+						}
+					}
+
+					function AcceptFriend(source) {
+						try {
+							$.ajax({
+								url: APP_LINK_SC + "/friends/UpdateFriend",
+								type: "PUT",
+								data: '{"id":'+source.RockstarId+',"op":"confirm","accept":"true"}',
+								headers: {
+									"Content-Type": "application/json",
+									"RequestVerificationToken": verificationToken
+								},
+								error: function (err) {
+									logRequest("UpdateFriend AJAX FAIL", this, err);
+
+									swal(
+										getTimedSwalArgs(
+											"error",
+											err.status + " - " + err.statusText,
+											"Something went wrong trying to accept <strong>" + source.Nickname + "</strong>'s friend request."
+										)
+									);
+								},
+								success: function (data) {
+									logRequest("UpdateFriend AJAX OK", this, data);
+
+									if (data.Status == true) {
+										swal(
+											getTimedSwalArgs(
+												"success",
+												"User accepted",
+												"<p><strong>" + source.Nickname + "</strong> already sent you a friend request, and we accepted it instead of sending a new one.</p><p>To view the changes to your friends list, please refresh the page.</p>",
+											)
+										);
+									} else {
+										swal(
+											getTimedSwalArgs(
+												"error",
+												"Something went wrong",
+												"Something went wrong trying to accept <strong>" + source.Nickname + "</strong>'s friend request."
+											)
+										);
+									}
+								},
+								xhr: function () {
+									var xhr = jQuery.ajaxSettings.xhr();
+									var setRequestHeader = xhr.setRequestHeader;
+									
+									xhr.setRequestHeader = function (name, value) {
+										if (name == 'X-Requested-With') return;
+										setRequestHeader.call(this, name, value);
+									}
+
+									return xhr;
+								}
+							});
+						} catch (err) {
+							logError("AcceptFriend FAIL", err);
 							return;
 						}
 					}
