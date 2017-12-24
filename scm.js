@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = "1.2";
+	const APP_VERSION = "1.3";
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_AUTHOR = "Senexys";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
@@ -1137,7 +1137,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								getPersistentSwalArgs(
 									"warning",
 									"Update available!",
-									"<p>"+APP_NAME+" <strong>v"+json.version+"</strong> is now available!</p><p>It was released on "+json.date+" and contains the following changes:</p><ul><li>"+json.changes.replace('|', ';</li><li>')+"</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function () {if(!document.getElementById(\"nt-mtjs\")) {var mtjs=document.createElement(\"script\");mtjs.id=\"nt-mtjs\",mtjs.src=\""+json.link+"\",document.getElementsByTagName(\"head\")[0].appendChild(mtjs)}setTimeout(function () {try{Init(\""+friendMessage+"\","+checkBlocked+")}}catch(err) {alert(\""+APP_NAME+" loading failed: Please try clicking your bookmark again.\")},1e3);})();</textarea>"
+									"<p>"+APP_NAME+" <strong>v"+json.version+"</strong> is now available!</p><p>It was released on "+json.date+" and contains the following changes:</p><ul><li>"+json.changes.replace('|', ';</li><li>')+"</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + "," + debug + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
 								)
 							);
 						} else {
