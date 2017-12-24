@@ -6,7 +6,6 @@ function Init(friendMessage, checkBlocked, debug) {
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
 	const APP_LINK_VERSIONS = "https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback";
 	const APP_LINK_SC = "https://socialclub.rockstargames.com";
-	const APP_DEBUG = debug;
 
 	if (friendMessage === undefined) friendMessage = "";
 	friendMessage = friendMessage.replace(/\\\"/g, '').replace(/\"/g, '').replace(/\s\s+/g, ' ').trim();
@@ -14,7 +13,7 @@ function Init(friendMessage, checkBlocked, debug) {
 	if (checkBlocked === undefined) checkBlocked = 1;
 
 	function logGeneric(title, body) {
-		if (APP_DEBUG === undefined) return;
+		if (debug === undefined) return;
 
 		console.groupCollapsed(title);
 		console.log(body);
@@ -28,7 +27,7 @@ function Init(friendMessage, checkBlocked, debug) {
 	}
 
 	function logRequest(title, request, response) {
-		if (APP_DEBUG === undefined) return;
+		if (debug === undefined) return;
 
 		console.groupCollapsed(title);
 		console.group("Request");
