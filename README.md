@@ -1,5 +1,7 @@
 # Social Club Tool
 
+*Now minified thanks to Matthias Mullie's [Minify](https://www.minifier.org/). That was long overdue.*
+
 ## Functionality
 
 This small tool provides you with some useful additional functionality Social Club itself does not yet offer:
