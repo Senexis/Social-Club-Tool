@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 15;
+	const APP_VERSION = 16;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -103,6 +103,17 @@ function Init(friendMessage, checkBlocked) {
 
 	setTimeout(function () {
 		if (window.location.href.indexOf(APP_LINK_SC_CHECK) !== -1) {
+			if (!window.location.href.startsWith(APP_LINK_SC)) {
+				swal(
+					getPersistentSwalArgs(
+						"error",
+						"Not supported",
+						APP_NAME + " currently does not support languages other than English due to limitations. Please switch to the English language and click the bookmark again."
+					)
+				);
+				return;
+			}
+
 			try {
 				try {
 					var verificationToken = $(siteMaster.aft)[0].value;
