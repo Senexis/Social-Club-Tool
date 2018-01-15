@@ -1,11 +1,12 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = "1.4";
+	const APP_VERSION = "1.4.1";
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_AUTHOR = "Senex";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
 	const APP_LINK_VERSIONS = "https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback";
 	const APP_LINK_SC = "https://socialclub.rockstargames.com";
+	const APP_LINK_SC_CHECK = "socialclub.rockstargames.com";
 
 	if (friendMessage === undefined) friendMessage = "";
 	friendMessage = friendMessage.replace(/\\\"/g, '').replace(/\"/g, '').replace(/\s\s+/g, ' ').trim();
@@ -102,7 +103,7 @@ function Init(friendMessage, checkBlocked, debug) {
 	}
 
 	setTimeout(function () {
-		if (window.location.href.startsWith(APP_LINK_SC)) {
+		if (window.location.href.indexOf(APP_LINK_SC_CHECK) !== -1) {
 			try {
 				try {
 					var verificationToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
