@@ -1,6 +1,7 @@
-function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = "1.4.1";
+function Init(friendMessage, checkBlocked) {
+	const APP_VERSION = 15;
 	const APP_NAME = "Social Club Utility Tool";
+	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
@@ -13,24 +14,20 @@ function Init(friendMessage, checkBlocked, debug) {
 
 	if (checkBlocked === undefined) checkBlocked = 1;
 
-	function logGeneric(title, body) {
-		if (debug === undefined) return;
-
-		console.groupCollapsed(title);
+	function logInfo(title, body) {
+		console.groupCollapsed("[" + APP_NAME_SHORT + ": INFO] " + title);
 		console.log(body);
 		console.groupEnd();
 	}
 
 	function logError(title, body) {
-		console.groupCollapsed(title);
+		console.groupCollapsed("[" + APP_NAME_SHORT + ": ERROR] " + title);
 		console.error(body);
 		console.groupEnd();
 	}
 
 	function logRequest(title, request, response) {
-		if (debug === undefined) return;
-
-		console.groupCollapsed(title);
+		console.groupCollapsed("[" + APP_NAME_SHORT + ": AJAX] " + title);
 		console.group("Request");
 		console.log(request);
 		console.groupEnd();
@@ -57,7 +54,9 @@ function Init(friendMessage, checkBlocked, debug) {
 		};
 	}
 
-	function getTimedSwalArgs(type, title, body) {
+	function getTimedSwalArgs(type, title, body, timer) {
+		if (timer === undefined) timer = 5000;
+
 		return {
 			type: type,
 			title: title,
@@ -65,7 +64,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 			allowOutsideClick: true,
 			html: true,
-			timer: 5000
+			timer: timer
 		};
 	}
 
@@ -98,7 +97,7 @@ function Init(friendMessage, checkBlocked, debug) {
 		sajs.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
 		document.getElementsByTagName('head')[0].appendChild(sajs);
 	} catch (err) {
-		logError("Script loading FAIL", err);
+		logError("Something went wrong while trying to load the necessary scripts.", err);
 		return;
 	}
 
@@ -106,11 +105,32 @@ function Init(friendMessage, checkBlocked, debug) {
 		if (window.location.href.indexOf(APP_LINK_SC_CHECK) !== -1) {
 			try {
 				try {
-					var verificationToken = siteMaster.aft.replace('<input name="__RequestVerificationToken" type="hidden" value="', '').replace('" />', '').trim();
+					var verificationToken = $(siteMaster.aft)[0].value;
 					var userNickname = siteMaster.authUserNickName;
 					var isLoggedIn = siteMaster.isLoggedIn;
 				} catch (err) {
-					logError("Account data retrieval FAIL", err);
+					if (err instanceof DOMException) {
+						logError("The jQuery library did not successfully load.", err);
+
+						swal(
+							getPersistentSwalArgs(
+								"error",
+								"Load unsuccessful",
+								APP_NAME + " was not loaded correctly. Please try clicking the bookmark again without refreshing the page."
+							)
+						);
+					} else {
+						logError("Could not fetch all necessary account data because something went wrong.", err);
+
+						swal(
+							getPersistentSwalArgs(
+								"error",
+								"An error occured",
+								"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to retrieve the required account data. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
+							)
+						);
+					}
+
 					return;
 				}
 
@@ -130,7 +150,58 @@ function Init(friendMessage, checkBlocked, debug) {
 					$('<a id="nt-daf" class="btn btnGold btnRounded" href="javascript:void(0)">delete all friends</a>').prependTo('#page');
 					$('<a id="nt-raf" class="btn btnGold btnRounded" href="javascript:void(0)">reject all friend requests</a>').prependTo('#page');
 					$('<a id="nt-qa" class="btn btnGold btnRounded" href="javascript:void(0)">quick-add user</a>').prependTo('#page');
-					$('<li id="nt-cred"><a href="'+APP_LINK+'" target="_blank">'+APP_NAME+' v'+APP_VERSION+'</a> by '+APP_AUTHOR+'</li>').appendTo('#footerNav');
+					$('<li id="nt-cred"> // <a href="' + APP_LINK + '" target="_blank"><span style="color:#f90">' + APP_NAME + '</span> v' + APP_VERSION + ' by ' + APP_AUTHOR + '</a> // </li>').appendTo('#footerNav');
+
+					// Data utility functions.
+					function DoGetRequest(object) {
+						$.ajax({
+							url: object.url,
+							error: object.error,
+							success: object.success,
+							type: "GET",
+							headers: {
+								"Content-Type": "application/json",
+								"RequestVerificationToken": verificationToken
+							},
+							xhr: function () {
+								var xhr = jQuery.ajaxSettings.xhr();
+								var setRequestHeader = xhr.setRequestHeader;
+								
+								xhr.setRequestHeader = function (name, value) {
+									if (name == 'X-Requested-With') return;
+									setRequestHeader.call(this, name, value);
+								}
+
+								return xhr;
+							}
+						});
+					}
+
+					function DoDataRequest(object) {
+						$.ajax({
+							url: object.url,
+							data: JSON.stringify(object.data),
+							error: object.error,
+							success: object.success,
+							complete: object.complete,
+							type: object.type,
+							headers: {
+								"Content-Type": "application/json",
+								"RequestVerificationToken": verificationToken
+							},
+							xhr: function () {
+								var xhr = jQuery.ajaxSettings.xhr();
+								var setRequestHeader = xhr.setRequestHeader;
+								
+								xhr.setRequestHeader = function (name, value) {
+									if (name == 'X-Requested-With') return;
+									setRequestHeader.call(this, name, value);
+								}
+
+								return xhr;
+							}
+						});
+					}
 
 					// Add click listeners to the different elements.
 					$("#nt-dam").click(function (e) {
@@ -145,14 +216,10 @@ function Init(friendMessage, checkBlocked, debug) {
 								),
 								function (isConfirm) {
 									if (isConfirm) {
-										$.ajax({
+										DoGetRequest({
 											url: APP_LINK_SC + "/Message/GetMessageCount",
-											headers: {
-												"Accept": "application/json",
-												"RequestVerificationToken": verificationToken
-											},
 											error: function (err) {
-												logRequest("GetMessageCount AJAX FAIL", this, err);
+												logRequest("Couldn't fetch the total message count in #nt-dam_click.", this, err);
 
 												swal(
 													getTimedSwalArgs(
@@ -163,7 +230,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												);
 											},
 											success: function (data) {
-												logRequest("GetMessageCount AJAX OK", this, data);
+												logRequest("Successfully fetched the total message count in #nt-dam_click.", this, data);
 
 												if (data.Total > 0) {
 													$('#nt-dam-progress-current').text(data.Total);
@@ -187,7 +254,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							);
 						} catch (err) {
-							logError("#nt-dam.click() FAIL", err);
+							logError("Something went wrong in #nt-dam_click.", err);
 							return false;
 						}
 
@@ -208,14 +275,10 @@ function Init(friendMessage, checkBlocked, debug) {
 									if (isConfirm) {
 										var children = [];
 
-										$.ajax({
+										DoGetRequest({
 											url: APP_LINK_SC + "/friends/GetReceivedInvitesJson",
-											headers: {
-												"Accept": "application/json",
-												"RequestVerificationToken": verificationToken
-											},
 											error: function (err) {
-												logRequest("GetReceivedInvitesJson AJAX FAIL", this, err);
+												logRequest("Couldn't fetch the total received invites count in #nt-raf_click.", this, err);
 
 												swal(
 													getTimedSwalArgs(
@@ -226,7 +289,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												);
 											},
 											success: function (data) {
-												logRequest("GetReceivedInvitesJson AJAX OK", this, data);
+												logRequest("Successfully fetched the total received invites count in #nt-raf_click.", this, data);
 
 												if (data.Status == true && data.TotalCount > 0) {
 													$('#nt-raf-progress-current').text(data.TotalCount);
@@ -238,7 +301,7 @@ function Init(friendMessage, checkBlocked, debug) {
 													});
 
 													if (children.length == data.TotalCount) {
-														RemoveFriend(children, true);
+														RemoveFriends(children, true);
 													};
 												} else if (data.Status == true && data.TotalCount == 0) {
 													swal(
@@ -265,7 +328,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							);
 						} catch (err) {
-							logError("#nt-raf.click() FAIL", err);
+							logError("Something went wrong in #nt-raf_click.", err);
 							return false;
 						}
 
@@ -284,14 +347,10 @@ function Init(friendMessage, checkBlocked, debug) {
 								),
 								function (isConfirm) {
 									if (isConfirm) {
-										$.ajax({
+										DoGetRequest({
 											url: APP_LINK_SC + "/friends/GetFriendsAndInvitesSentJson?pageNumber=0&onlineService=sc&pendingInvitesOnly=false",
-											headers: {
-												"Accept": "application/json",
-												"RequestVerificationToken": verificationToken
-											},
 											error: function (err) {
-												logRequest("GetFriendsAndInvitesSentJson AJAX FAIL", this, err);
+												logRequest("Couldn't fetch the friends and invites sent list in #nt-daf_click.", this, err);
 
 												swal(
 													getTimedSwalArgs(
@@ -302,7 +361,7 @@ function Init(friendMessage, checkBlocked, debug) {
 												);
 											},
 											success: function (data) {
-												logRequest("GetFriendsAndInvitesSentJson AJAX OK", this, data);
+												logRequest("Successfully fetched the friends and invites sent list in #nt-daf_click.", this, data);
 
 												if (data.Status == true && data.TotalCount > 0) {
 													$('#nt-daf-progress-current').text(data.TotalCount);
@@ -335,7 +394,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								}
 							);
 						} catch (err) {
-							logError("#nt-daf.click() FAIL", err);
+							logError("Something went wrong in #nt-daf_click.", err);
 							return false;
 						}
 
@@ -349,7 +408,7 @@ function Init(friendMessage, checkBlocked, debug) {
 							swal({
 								type: "input",
 								title: "Enter username",
-								text: '<p>Please enter the Social Club username you want to add. When you click "Add", the user will automatically be added if it exists.</p>'+(checkBlocked ? "" : "<p><strong>Note:</strong> You have disabled the blocked users list check. If the user is on your blocked users list, they will be unblocked and sent a friend request.</p>")+(friendMessage == "" ? "" : "<p><strong>Note:</strong> You have set a custom friend request message, which will get sent to the user.</p>"),
+								text: '<p>Please enter the Social Club username you want to add. When you click "Add", the user will automatically be added if it exists.</p>' + (checkBlocked ? "" : "<p><strong>Note:</strong> You have disabled the blocked users list check. If the user is on your blocked users list, they will be unblocked and sent a friend request.</p>") + (friendMessage == "" ? "" : "<p><strong>Note:</strong> You have set a custom friend request message, which will get sent to the user.</p>"),
 
 								allowEscapeKey: false,
 								closeOnConfirm: false,
@@ -388,14 +447,10 @@ function Init(friendMessage, checkBlocked, debug) {
 									return false
 								}
 
-								$.ajax({
+								DoGetRequest({
 									url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname=" + inputValue + "&full=false",
-									headers: {
-										"Accept": "application/json",
-										"RequestVerificationToken": verificationToken
-									},
 									error: function (err) {
-										logRequest("GetAccountDetails AJAX FAIL", this, err);
+										logRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, err);
 
 										swal(
 											getTimedSwalArgs(
@@ -406,7 +461,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										);
 									},
 									success: function (data) {
-										logRequest("GetAccountDetails AJAX OK", this, data);
+										logRequest("Successfully fetched the account details of " + inputValue + " in #nt-qa_click.", this, data);
 
 										if (data.Status == true) {
 											if (data.Relation == "Friend") {
@@ -451,7 +506,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							});
 						} catch (err) {
-							logError("#nt-qa.click() FAIL", err);
+							logError("Something went wrong in #nt-qa_click.", err);
 							return false;
 						}
 
@@ -464,14 +519,10 @@ function Init(friendMessage, checkBlocked, debug) {
 							if (pageIndex === undefined) pageIndex = 0;
 
 							setTimeout(function () {
-								$.ajax({
-									url: APP_LINK_SC + "/Message/GetConversationList?pageIndex="+pageIndex,
-									headers: {
-										"Accept": "application/json",
-										"RequestVerificationToken": verificationToken
-									},
+								DoGetRequest({
+									url: APP_LINK_SC + "/Message/GetConversationList?pageIndex=" + pageIndex,
 									error: function (err) {
-										logRequest("GetConversationList AJAX FAIL", this, err);
+										logRequest("Couldn't fetch the conversation list in RetrieveAllMessageUsers().", this, err);
 
 										swal(
 											getTimedSwalArgs(
@@ -482,7 +533,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										);
 									},
 									success: function (data) {
-										logRequest("GetConversationList AJAX OK", this, data);
+										logRequest("Successfully fetched the conversation list in RetrieveAllMessageUsers().", this, data);
 
 										data.Users.forEach(function (e) {
 											source.push(e);
@@ -498,7 +549,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							logError("RetrieveAllMessageUsers FAIL", err);
+							logError("Something went wrong in RetrieveAllMessageUsers().", err);
 							return;
 						}
 					}
@@ -514,27 +565,23 @@ function Init(friendMessage, checkBlocked, debug) {
 									return;
 								}
 
-								logGeneric("RetrieveAllMessages() POP", item);
+								logInfo("Popped the items list in RetrieveAllMessages().", item);
 
-								$.ajax({
-									url: APP_LINK_SC + "/Message/GetMessages?rockstarId="+item.RockstarId,
-									headers: {
-										"Accept": "application/json",
-										"RequestVerificationToken": verificationToken
-									},
+								DoGetRequest({
+									url: APP_LINK_SC + "/Message/GetMessages?rockstarId=" + item.RockstarId,
 									error: function (err) {
-										logRequest("GetMessages AJAX FAIL", this, err);
+										logRequest("Couldn't fetch the messages list in RetrieveAllMessages().", this, err);
 
 										if (source.length > 0) {
 											RetrieveAllMessages(source, target);
 										} else if (target.length > 0) {
 											$('#nt-dam-retrieving').hide();
 											$('#nt-dam-progress').show();
-											RemoveMessage(target);
+											RemoveMessages(target);
 										}
 									},
 									success: function (data) {
-										logRequest("GetMessages AJAX OK", this, data);
+										logRequest("Successfully fetched the messages list in RetrieveAllMessages().", this, data);
 
 										target = target.concat(data.Messages);
 
@@ -543,112 +590,76 @@ function Init(friendMessage, checkBlocked, debug) {
 										} else if (target.length > 0) {
 											$('#nt-dam-retrieving').hide();
 											$('#nt-dam-progress').show();
-											RemoveMessage(target);
+											RemoveMessages(target);
 										}
 									}
 								});
 							}, 1000)
 						} catch (err) {
-							logError("RetrieveAllMessages FAIL", err);
+							logError("Something went wrong in RetrieveAllMessages().", err);
 							return;
 						}
 					}
 
-					function RemoveMessage(source) {
+					function RemoveMessages(source, hasError) {
 						try {
+							if (hasError === undefined) hasError = false;
+
 							setTimeout(function () {
+								var CompleteFunction = function () {
+									$('#nt-dam-progress-current').text(source.length);
+
+									if (source.length > 0) {
+										RemoveMessages(source, hasError);
+										return;
+									}
+
+									var status = !hasError ? "success" : "warning";
+									var timer = !hasError ? 5000 : 60000;
+
+									swal(
+										getTimedSwalArgs(
+											status,
+											"Messages removed",
+											(hasError ? "<p>One or more messages could not be deleted due to an error. Please try again or remove them manually.</p>" : "<p>All messages in your inbox have been deleted.</p>") + "<p>To view the changes to your inbox, please refresh the page.</p>",
+											timer
+										)
+									);
+								}
+
 								var item = source.pop();
 								if (item === undefined) {
-									RemoveMessage(source);
+									logError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+									CompleteFunction();
 									return;
 								}
 
-								logGeneric("RemoveMessage() POP", item);
+								logInfo("Popped the items list in RemoveMessages().", item);
 
-								$.ajax({
+								DoDataRequest({
 									url: APP_LINK_SC + "/Message/DeleteMessage",
 									type: "POST",
-									data: '{"messageid":'+item.ID+',"isAdmin":'+item.IsAdminMessage+'}',
-									headers: {
-										"Content-Type": "application/json",
-										"RequestVerificationToken": verificationToken
+									data: {
+										"messageid": item.ID,
+										"isAdmin": item.IsAdminMessage
 									},
 									error: function (err) {
-										logRequest("DeleteMessage AJAX FAIL", this, err);
+										logRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
 
-										if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
-											logError("A message you sent to someone could not be removed.", err);
-										} else {
-											logError("A message " + item.ScNickname + " sent to you could not be removed.", err);
-										}
-
-										if (source.length > 0) {
-											$('#nt-dam-progress-current').text(source.length);
-											RemoveMessage(source);
-										} else {
-											swal(
-												getTimedSwalArgs(
-													"success",
-													"Messages removed",
-													"<p>All of the messages in your inbox should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.</p>"
-												)
-											);
-										}
+										hasError = true;
 									},
 									success: function (data) {
-										logRequest("DeleteMessage AJAX OK", this, data);
+										logRequest("Successfully completed deleted message " + item.ID + " in RemoveMessages().", this, data);
 
-										if (data.Status == true) {
-											if (item.ScNickname != undefined) {
-												if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
-													logGeneric("A message you sent to someone has been removed.");
-												} else {
-													logGeneric("A message " + item.ScNickname + " sent to you has been removed.");
-												}
-											} else {
-												logGeneric("A message someone sent to you has been removed.");
-											}
-										} else {
-											if (item.ScNickname != undefined) {
-												if (item.ScNickname.toLowerCase() === userNickname.toLowerCase()) {
-													logError("A message you sent to someone could not be removed.", "data.Status != true");
-												} else {
-													logError("A message " + item.ScNickname + " sent to you could not be removed.", "data.Status != true");
-												}
-											} else {
-												logError("A message someone sent to you could not be removed.", "data.Status != true");
-											}
-										}
-
-										if (source.length > 0) {
-											$('#nt-dam-progress-current').text(source.length);
-
-											RemoveMessage(source);
-										} else {
-											swal(
-												getTimedSwalArgs(
-													"success",
-													"Messages removed",
-													"<p>All of the messages in your inbox should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your inbox, please browse to your inbox.</p>"
-												)
-											);
+										if (data.Status != true) {
+											hasError = true;
 										}
 									},
-									xhr: function () {
-										var xhr = jQuery.ajaxSettings.xhr();
-										var setRequestHeader = xhr.setRequestHeader;
-										
-										xhr.setRequestHeader = function (name, value) {
-											if (name == 'X-Requested-With') return;
-											setRequestHeader.call(this, name, value);
-										}
-
-										return xhr;
-									}
+									complete: CompleteFunction
 								});
 							}, 1000)
 						} catch (err) {
-							logError("RemoveMessage FAIL", err);
+							logError("Something went wrong in RemoveMessages().", err);
 							return;
 						}
 					}
@@ -658,14 +669,10 @@ function Init(friendMessage, checkBlocked, debug) {
 							if (pageIndex === undefined) pageIndex = 0;
 
 							setTimeout(function () {
-								$.ajax({
+								DoGetRequest({
 									url: APP_LINK_SC + "/friends/GetFriendsAndInvitesSentJson?pageNumber=" + pageIndex + "&onlineService=sc&pendingInvitesOnly=false",
-									headers: {
-										"Accept": "application/json",
-										"RequestVerificationToken": verificationToken
-									},
 									error: function (err) {
-										logRequest("GetFriendsAndInvitesSentJson AJAX FAIL", this, err);
+										logRequest("Couldn't fetch the friends and invites sent list in RetrieveAllFriends().", this, err);
 
 										swal(
 											getTimedSwalArgs(
@@ -676,7 +683,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										);
 									},
 									success: function (data) {
-										logRequest("GetFriendsAndInvitesSentJson AJAX OK", this, data);
+										logRequest("Successfully fetched the friends and invites sent list in RetrieveAllFriends().", this, data);
 
 										if (data.Status == true) {
 											data.RockstarAccounts.forEach(function (e) {
@@ -697,334 +704,104 @@ function Init(friendMessage, checkBlocked, debug) {
 										} else {
 											$('#nt-daf-retrieving').hide();
 											$('#nt-daf-progress').show();
-											RemoveFriend(source);
+											RemoveFriends(source);
 										}
 									}
 								});
 							}, 1000)
 						} catch (err) {
-							logError("RetrieveAllFriends FAIL", err);
+							logError("Something went wrong in RetrieveAllFriends().", err);
 							return;
 						}
 					}
 
-					function RemoveFriend(source, isFriendRequestLoop) {
+					function RemoveFriends(source, isFriendRequestLoop, errorObjects) {
 						try {
 							if (isFriendRequestLoop === undefined) isFriendRequestLoop = false;
+							if (errorObjects === undefined) errorObjects = [];
 
 							setTimeout(function () {
+								var operation = undefined;
+								var CompleteFunction = function () {
+									$('#nt-daf-progress-current, #nt-raf-progress-current').text(source.length);
+
+									if (source.length > 0) {
+										RemoveFriends(source, isFriendRequestLoop, errorObjects);
+										return;
+									}
+
+									var status = errorObjects.length === 0 ? "success" : "warning";
+									var timer = errorObjects.length === 0 ? 5000 : 60000;
+									var errorObjectsString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ( ( i === errorObjects.length - 2 ) ? ' and ' : ', ' ) }, '').slice(0, -2);
+
+									if (isFriendRequestLoop) {
+										swal(
+											getTimedSwalArgs(
+												status,
+												"Friend requests rejected",
+												(errorObjects.length !== 0 ? "<p>" + errorObjectsString + " could not be rejected due to an error. Please try again or remove them manually.</p>" : "<p>All friend requests you received have been rejected.</p>") + "<p>To view the changes to your friends list, please refresh the page.</p>",
+												timer
+											)
+										);
+									} else {
+										swal(
+											getTimedSwalArgs(
+												status,
+												"Friends removed",
+												(errorObjects.length !== 0 ? "<p>" + errorObjectsString + " could not be deleted due to an error. Please try again or remove them manually.</p>" : "<p>All friends have been deleted.</p>") + "<p>To view the changes to your friends list, please refresh the page.</p>",
+												timer
+											)
+										);
+									}
+								}
+
 								var item = source.pop();
 								if (item === undefined) {
-									RemoveFriend(source, isFriendRequestLoop);
+									logError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+									CompleteFunction();
 									return;
 								}
 
-								logGeneric("RemoveFriend() POP", item);
+								logInfo("Popped the items list in RemoveFriends().", item);
 
 								if (item.AllowDelete === true) {
-									$.ajax({
-										url: APP_LINK_SC + "/friends/UpdateFriend",
-										type: "PUT",
-										data: '{"id":'+item.RockstarId+',"op":"delete"}',
-										headers: {
-											"Content-Type": "application/json",
-											"RequestVerificationToken": verificationToken
-										},
-										error: function (err) {
-											logRequest("UpdateFriend AJAX FAIL", this, err);
-											logError("Your friend " + item.Name + " could not be removed.", err);
-
-											if (source.length > 0) {
-												if (isFriendRequestLoop) {
-													$('#nt-raf-progress-current').text(source.length);
-												} else {
-													$('#nt-daf-progress-current').text(source.length);
-												}
-
-												RemoveFriend(source);
-											} else {
-												if (isFriendRequestLoop) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friend requests rejected",
-															"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friends removed",
-															"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												}
-											}
-										},
-										success: function (data) {
-											logRequest("UpdateFriend AJAX OK", this, data);
-
-											if (data.Status == true) {
-												logGeneric("Your friend " + item.Name + " has been removed.");
-											} else {
-												logError("Your friend " + item.Name + " could not be removed.", "data.Status != true");
-											}
-
-											if (source.length > 0) {
-												if (isFriendRequestLoop) {
-													$('#nt-raf-progress-current').text(source.length);
-												} else {
-													$('#nt-daf-progress-current').text(source.length);
-												}
-
-												RemoveFriend(source);
-											} else {
-												if (isFriendRequestLoop) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friend requests rejected",
-															"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friends removed",
-															"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												}
-											}
-										},
-										xhr: function () {
-											var xhr = jQuery.ajaxSettings.xhr();
-											var setRequestHeader = xhr.setRequestHeader;
-											
-											xhr.setRequestHeader = function (name, value) {
-												if (name == 'X-Requested-With') return;
-												setRequestHeader.call(this, name, value);
-											}
-
-											return xhr;
-										}
-									});
+									operation = "delete";
 								} else if (item.AllowCancel === true) {
-									$.ajax({
-										url: APP_LINK_SC + "/friends/UpdateFriend",
-										type: "PUT",
-										data: '{"id":'+item.RockstarId+',"op":"cancel"}',
-										headers: {
-											"Content-Type": "application/json",
-											"RequestVerificationToken": verificationToken
-										},
-										error: function (err) {
-											logRequest("UpdateFriend AJAX FAIL", this, err);
-											logError("The friend request you sent to " + item.Name + " could not be cancelled.", err);
-
-											if (source.length > 0) {
-												if (isFriendRequestLoop) {
-													$('#nt-raf-progress-current').text(source.length);
-												} else {
-													$('#nt-daf-progress-current').text(source.length);
-												}
-
-												RemoveFriend(source);
-											} else {
-												if (isFriendRequestLoop) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friend requests rejected",
-															"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friends removed",
-															"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												}
-											}
-										},
-										success: function (data) {
-											logRequest("UpdateFriend AJAX OK", this, data);
-
-											if (data.Status == true) {
-												logGeneric("The friend request you sent to " + item.Name + " has been cancelled.");
-											} else {
-												logError("The friend request you sent to " + item.Name + " could not be cancelled.", "data.Status != true");
-											}
-
-											if (source.length > 0) {
-												if (isFriendRequestLoop) {
-													$('#nt-raf-progress-current').text(source.length);
-												} else {
-													$('#nt-daf-progress-current').text(source.length);
-												}
-
-												RemoveFriend(source);
-											} else {
-												if (isFriendRequestLoop) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friend requests rejected",
-															"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friends removed",
-															"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												}
-											}
-										},
-										xhr: function () {
-											var xhr = jQuery.ajaxSettings.xhr();
-											var setRequestHeader = xhr.setRequestHeader;
-											
-											xhr.setRequestHeader = function (name, value) {
-												if (name == 'X-Requested-With') return;
-												setRequestHeader.call(this, name, value);
-											}
-
-											return xhr;
-										}
-									});
+									operation = "cancel";
 								} else if (item.AllowAdd === true) {
-									$.ajax({
-										url: APP_LINK_SC + "/friends/UpdateFriend",
-										type: "PUT",
-										data: '{"id":'+item.RockstarId+',"op":"ignore"}',
-										headers: {
-											"Content-Type": "application/json",
-											"RequestVerificationToken": verificationToken
-										},
-										error: function (err) {
-											logRequest("UpdateFriend AJAX FAIL", this, err);
-											logError("The friend request you received from " + item.Name + " could not be rejected.", err);
-
-											if (source.length > 0) {
-												if (isFriendRequestLoop) {
-													$('#nt-raf-progress-current').text(source.length);
-												} else {
-													$('#nt-daf-progress-current').text(source.length);
-												}
-
-												RemoveFriend(source);
-											} else {
-												if (isFriendRequestLoop) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friend requests rejected",
-															"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friends removed",
-															"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												}
-											}
-										},
-										success: function (data) {
-											logRequest("UpdateFriend AJAX OK", this, data);
-
-											if (data.Status == true) {
-												logGeneric("The friend request you received from " + item.Name + " has been rejected.");
-											} else {
-												logError("The friend request you received from " + item.Name + " could not be rejected.", "data.Status != true");
-											}
-
-											if (source.length > 0) {
-												if (isFriendRequestLoop) {
-													$('#nt-raf-progress-current').text(source.length);
-												} else {
-													$('#nt-daf-progress-current').text(source.length);
-												}
-
-												RemoveFriend(source);
-											} else {
-												if (isFriendRequestLoop) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friend requests rejected",
-															"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Friends removed",
-															"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-														)
-													);
-												}
-											}
-										},
-										xhr: function () {
-											var xhr = jQuery.ajaxSettings.xhr();
-											var setRequestHeader = xhr.setRequestHeader;
-											
-											xhr.setRequestHeader = function (name, value) {
-												if (name == 'X-Requested-With') return;
-												setRequestHeader.call(this, name, value);
-											}
-
-											return xhr;
-										}
-									});
+									operation = "ignore";
 								} else {
-									logError("The user " + item.Name + " has been skipped.", "type \""+item.Relationship+"\" not supported");
+									logError("An item has been skipped.", "No operation is possible for " + item.Name + ".");
 
-									if (source.length > 0) {
-										if (isFriendRequestLoop) {
-											$('#nt-raf-progress-current').text(source.length);
-										} else {
-											$('#nt-daf-progress-current').text(source.length);
-										}
-
-										RemoveFriend(source);
-									} else {
-										if (isFriendRequestLoop) {
-											swal(
-												getTimedSwalArgs(
-													"success",
-													"Friend requests rejected",
-													"<p>All friend requests you received should have been rejected.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-												)
-											);
-										} else {
-											swal(
-												getTimedSwalArgs(
-													"success",
-													"Friends removed",
-													"<p>All your friends should have been removed.</p><p>You can see exactly which friends have been removed and which ones haven't by opening the console (F12). To view the changes to your friends list, please refresh the page.</p>"
-												)
-											);
-										}
-									}
+									errorObjects.push(item.Name);
+									CompleteFunction();
+									return;
 								}
+
+								DoDataRequest({
+									url: APP_LINK_SC + "/friends/UpdateFriend",
+									type: "PUT",
+									data: {
+										"id": item.RockstarId,
+										"op": operation
+									},
+									error: function (err) {
+										logRequest("Couldn't complete " + operation + " " + item.Name + " in RemoveFriends().", this, err);
+
+										errorObjects.push(item.Name);
+									},
+									success: function (data) {
+										logRequest("Successfully completed " + operation + " " + item.Name + " in RemoveFriends().", this, data);
+
+										if (data.Status != true) {
+											errorObjects.push(item.Name);
+										}
+									},
+									complete: CompleteFunction
+								});
 							}, 1000)
 						} catch (err) {
-							logError("RemoveFriend FAIL", err);
+							logError("Something went wrong in RemoveFriends().", err);
 							return;
 						}
 					}
@@ -1034,14 +811,10 @@ function Init(friendMessage, checkBlocked, debug) {
 							var target = [];
 
 							setTimeout(function () {
-								$.ajax({
+								DoGetRequest({
 									url: APP_LINK_SC + "/friends/GetBlockedJson",
-									headers: {
-										"Accept": "application/json",
-										"RequestVerificationToken": verificationToken
-									},
 									error: function (err) {
-										logRequest("GetBlockedJson AJAX FAIL", this, err);
+										logRequest("Couldn't fetch blocked users list in RetrieveBlockedList().", this, err);
 
 										swal(
 											getTimedSwalArgs(
@@ -1052,7 +825,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										);
 									},
 									success: function (data) {
-										logRequest("GetBlockedJson AJAX OK", this, data);
+										logRequest("Successfully fetched blocked users list in RetrieveBlockedList().", this, data);
 
 										if (data.Status == true) {
 											data.RockstarAccounts.forEach(function (e) {
@@ -1087,23 +860,23 @@ function Init(friendMessage, checkBlocked, debug) {
 								});
 							}, 1000)
 						} catch (err) {
-							logError("RetrieveBlockedList FAIL", err);
+							logError("Something went wrong in RetrieveBlockedList().", err);
 							return;
 						}
 					}
 
 					function AddFriend(source) {
 						try {
-							$.ajax({
+							DoDataRequest({
 								url: APP_LINK_SC + "/friends/UpdateFriend",
 								type: "PUT",
-								data: '{"id":'+source.RockstarId+',"op":"addfriend","custommessage":"'+friendMessage+'"}',
-								headers: {
-									"Content-Type": "application/json",
-									"RequestVerificationToken": verificationToken
+								data: {
+									"id": source.RockstarId,
+									"op": "addfriend",
+									"custommessage": friendMessage
 								},
 								error: function (err) {
-									logRequest("UpdateFriend AJAX FAIL", this, err);
+									logRequest("Couldn't complete add " + source.Nickname + " in AddFriend().", this, err);
 
 									swal(
 										getTimedSwalArgs(
@@ -1114,7 +887,7 @@ function Init(friendMessage, checkBlocked, debug) {
 									);
 								},
 								success: function (data) {
-									logRequest("UpdateFriend AJAX OK", this, data);
+									logRequest("Successfully completed add " + source.Nickname + " in AddFriend().", this, data);
 
 									if (data.Status == true) {
 										swal(
@@ -1133,37 +906,26 @@ function Init(friendMessage, checkBlocked, debug) {
 											)
 										);
 									}
-								},
-								xhr: function () {
-									var xhr = jQuery.ajaxSettings.xhr();
-									var setRequestHeader = xhr.setRequestHeader;
-									
-									xhr.setRequestHeader = function (name, value) {
-										if (name == 'X-Requested-With') return;
-										setRequestHeader.call(this, name, value);
-									}
-
-									return xhr;
 								}
 							});
 						} catch (err) {
-							logError("AddFriend FAIL", err);
+							logError("Something went wrong in AddFriend().", err);
 							return;
 						}
 					}
 
 					function AcceptFriend(source) {
 						try {
-							$.ajax({
+							DoDataRequest({
 								url: APP_LINK_SC + "/friends/UpdateFriend",
 								type: "PUT",
-								data: '{"id":'+source.RockstarId+',"op":"confirm","accept":"true"}',
-								headers: {
-									"Content-Type": "application/json",
-									"RequestVerificationToken": verificationToken
+								data: {
+									"id": source.RockstarId,
+									"op": "confirm",
+									"accept": "true"
 								},
 								error: function (err) {
-									logRequest("UpdateFriend AJAX FAIL", this, err);
+									logRequest("Couldn't complete accept " + source.Nickname + "'s friend request in AcceptFriend().", this, err);
 
 									swal(
 										getTimedSwalArgs(
@@ -1174,7 +936,7 @@ function Init(friendMessage, checkBlocked, debug) {
 									);
 								},
 								success: function (data) {
-									logRequest("UpdateFriend AJAX OK", this, data);
+									logRequest("Successfully completed accept " + source.Nickname + "'s friend request in AcceptFriend().", this, data);
 
 									if (data.Status == true) {
 										swal(
@@ -1193,35 +955,24 @@ function Init(friendMessage, checkBlocked, debug) {
 											)
 										);
 									}
-								},
-								xhr: function () {
-									var xhr = jQuery.ajaxSettings.xhr();
-									var setRequestHeader = xhr.setRequestHeader;
-									
-									xhr.setRequestHeader = function (name, value) {
-										if (name == 'X-Requested-With') return;
-										setRequestHeader.call(this, name, value);
-									}
-
-									return xhr;
 								}
 							});
 						} catch (err) {
-							logError("AcceptFriend FAIL", err);
+							logError("Something went wrong in AcceptFriend().", err);
 							return;
 						}
 					}
 
 					$.getJSON(APP_LINK_VERSIONS, function (json) {
-						logRequest("Update getJSON OK", this, json);
+						logRequest("Successfully fetched v.json in the update checker.", this, json);
 					})
 					.success(function (json) {
-						if (json.version != APP_VERSION && json.released) {
+						if (json.released && json.version > APP_VERSION) {
 							swal(
 								getPersistentSwalArgs(
 									"warning",
 									"Update available!",
-									"<p>"+APP_NAME+" <strong>v"+json.version+"</strong> is now available!</p><p>It was released on "+json.date+" and contains the following changes:</p><ul><li>"+json.changes.replace(/\|/g, ";</li><li>")+"</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + "," + debug + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
+									"<p>" + APP_NAME + " <strong>v" + json.version + "</strong> is now available!</p><p>It was released on " + json.date + " and contains the following changes:</p><ul><li>" + json.changes.replace(/\|/g, "</li><li>") + "</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
 								)
 							);
 						} else {
@@ -1235,7 +986,7 @@ function Init(friendMessage, checkBlocked, debug) {
 						}
 					})
 					.error(function (err) {
-						logRequest("Update getJSON FAIL", this, err);
+						logRequest("Couldn't fetch v.json in the update checker.", this, err);
 
 						swal(
 							getTimedSwalArgs(
@@ -1253,48 +1004,37 @@ function Init(friendMessage, checkBlocked, debug) {
 					}
 
 				} else {
-					logError("Log-in required.", "userNickname == \"\" || isLoggedIn");
+					logError("In order to use " + APP_NAME + ", you must log into your Social Club account.", "userNickname == \"\" || isLoggedIn != true");
 
 					swal(
 						getPersistentSwalArgs(
 							"error",
 							"Log in required",
-							APP_NAME + " requires you to log in to be able to apply changes to your account. Please log into the account you want to use with "+APP_NAME+", then click the bookmark again."
+							APP_NAME + " requires you to log in to be able to apply changes to your account. Please log into the account you want to use with " + APP_NAME + ", then click the bookmark again."
 						)
 					);
 				}
 			} catch (err) {
-				if (err instanceof DOMException) {
-					logError("Load FAIL", err);
+				logError("Something went wrong.", err);
 
-					swal(
-						getPersistentSwalArgs(
-							"error",
-							"Load unsuccessful",
-							APP_NAME + " was not loaded correctly. Please try clicking the bookmark again without refreshing the page."
-						)
-					);
-				} else {
-					logError("General FAIL", err);
+				swal(
+					getPersistentSwalArgs(
+						"error",
+						"An error occured",
+						"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
+					)
+				);
 
-					swal(
-						getPersistentSwalArgs(
-							"error",
-							"An error occured",
-							APP_NAME + " was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please <a href=\""+APP_LINK_ISSUEs + "\" target=\"_blank\">submit an issue</a>."
-						)
-					);
-				}
 				return;
 			}
 		} else {
-			logError("Wrong website.", "!window.location.href.startsWith("+APP_LINK_SC+")");
+			logError("The current website is not a Social Club website and " + APP_NAME + " can't continue.", "window.location.href.indexOf(" + APP_LINK_SC_CHECK + ") === -1");
 
 			swal(
 				{
 					type: "warning",
 					title: "Wrong site",
-					text: "<p>Whoops, you accidentally activated "+APP_NAME+" on a wrong web page. To use "+APP_NAME+", first browse to the Social Club website, then click the bookmark again.</p><p>Do you want to go to the Social Club website now?</p>",
+					text: "<p>Whoops, you accidentally activated " + APP_NAME + " on a wrong web page. To use " + APP_NAME + ", first browse to the Social Club website, then click the bookmark again.</p><p>Do you want to go to the Social Club website now?</p>",
 
 					allowOutsideClick: true,
 					cancelButtonText: "No",
