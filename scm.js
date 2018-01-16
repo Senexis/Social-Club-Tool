@@ -1,13 +1,18 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 16;
+	const APP_VERSION = 17;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
 	const APP_LINK_VERSIONS = "https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback";
-	const APP_LINK_SC = "https://socialclub.rockstargames.com";
-	const APP_LINK_SC_CHECK = "socialclub.rockstargames.com";
+	const APP_LINK_SC = "https://" + window.location.host;
+
+	try {
+		console.log.apply(console, ["%c " + APP_NAME + " %cv" + APP_VERSION + " by " + APP_AUTHOR + " %c " + APP_LINK, "background:#000000;color:#f90", "background:#000000;color:#ffffff", ""]);
+	} catch (err) {
+		console.log(APP_NAME + " v" + APP_VERSION + " by " + APP_AUTHOR + " - " + APP_LINK);
+	}
 
 	if (friendMessage === undefined) friendMessage = "";
 	friendMessage = friendMessage.replace(/\\\"/g, '').replace(/\"/g, '').replace(/\s\s+/g, ' ').trim();
@@ -102,45 +107,60 @@ function Init(friendMessage, checkBlocked) {
 	}
 
 	setTimeout(function () {
-		if (window.location.href.indexOf(APP_LINK_SC_CHECK) !== -1) {
-			if (!window.location.href.startsWith(APP_LINK_SC)) {
+		try {
+			$.getJSON(APP_LINK_VERSIONS, function (json) {
+				logRequest("Successfully fetched v.json in the update checker.", this, json);
+			})
+			.success(function (json) {
+				if (json.released && json.version > APP_VERSION) {
+					swal(
+						getPersistentSwalArgs(
+							"warning",
+							"Update available!",
+							"<p>" + APP_NAME + " <strong>v" + json.version + "</strong> is now available!</p><p>It was released on " + json.date + " and contains the following changes:</p><ul><li>" + json.changes.replace(/\|/g, "</li><li>") + "</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
+						)
+					);
+				} else if (!json.released) {
+					logInfo("An update for " + APP_NAME + " was found but it wasn't released yet.", undefined);
+				} else {
+					logInfo("You are using the latest version of " + APP_NAME + "!", undefined);
+				}
+			})
+			.error(function (err) {
+				logRequest("Couldn't fetch v.json in the update checker.", this, err);
+			});
+		} catch (err) {
+			if (err instanceof DOMException) {
+				logError("The jQuery library did not successfully load.", err);
+
 				swal(
 					getPersistentSwalArgs(
 						"error",
-						"Not supported",
-						APP_NAME + " currently does not support languages other than English due to limitations. Please switch to the English language and click the bookmark again."
+						"Load unsuccessful",
+						APP_NAME + " did not load correctly. Please try clicking the bookmark again without refreshing the page."
 					)
 				);
-				return;
+			} else {
+				logError("Couldn't run the update checker because something went wrong.", err);
 			}
+		}
 
+		if (window.location.protocol === "https:" && window.location.host.endsWith("socialclub.rockstargames.com")) {
 			try {
 				try {
 					var verificationToken = $(siteMaster.aft)[0].value;
 					var userNickname = siteMaster.authUserNickName;
 					var isLoggedIn = siteMaster.isLoggedIn;
 				} catch (err) {
-					if (err instanceof DOMException) {
-						logError("The jQuery library did not successfully load.", err);
+					logError("Could not fetch all necessary account data because something went wrong.", err);
 
-						swal(
-							getPersistentSwalArgs(
-								"error",
-								"Load unsuccessful",
-								APP_NAME + " was not loaded correctly. Please try clicking the bookmark again without refreshing the page."
-							)
-						);
-					} else {
-						logError("Could not fetch all necessary account data because something went wrong.", err);
-
-						swal(
-							getPersistentSwalArgs(
-								"error",
-								"An error occured",
-								"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to retrieve the required account data. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
-							)
-						);
-					}
+					swal(
+						getPersistentSwalArgs(
+							"error",
+							"An error occured",
+							"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to retrieve the required account data. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
+						)
+					);
 
 					return;
 				}
@@ -973,47 +993,6 @@ function Init(friendMessage, checkBlocked) {
 							return;
 						}
 					}
-
-					$.getJSON(APP_LINK_VERSIONS, function (json) {
-						logRequest("Successfully fetched v.json in the update checker.", this, json);
-					})
-					.success(function (json) {
-						if (json.released && json.version > APP_VERSION) {
-							swal(
-								getPersistentSwalArgs(
-									"warning",
-									"Update available!",
-									"<p>" + APP_NAME + " <strong>v" + json.version + "</strong> is now available!</p><p>It was released on " + json.date + " and contains the following changes:</p><ul><li>" + json.changes.replace(/\|/g, "</li><li>") + "</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
-								)
-							);
-						} else {
-							swal(
-								getTimedSwalArgs(
-									"success",
-									"Loaded",
-									APP_NAME + " was loaded successfully!"
-								)
-							);
-						}
-					})
-					.error(function (err) {
-						logRequest("Couldn't fetch v.json in the update checker.", this, err);
-
-						swal(
-							getTimedSwalArgs(
-								"success",
-								"Loaded",
-								APP_NAME + " was loaded successfully!"
-							)
-						);
-					});
-
-					try {
-						console.log.apply(console, ["%c " + APP_NAME + " %cv" + APP_VERSION + " by " + APP_AUTHOR + " %c " + APP_LINK, "background: #000000;color: #f90", "background: #000000;color: #ffffff", ""]);
-					} catch (err) {
-						console.log(APP_NAME + " v" + APP_VERSION + " by " + APP_AUTHOR + " - " + APP_LINK);
-					}
-
 				} else {
 					logError("In order to use " + APP_NAME + ", you must log into your Social Club account.", "userNickname == \"\" || isLoggedIn != true");
 
