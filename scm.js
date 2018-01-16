@@ -1018,7 +1018,7 @@ function Init(friendMessage, checkBlocked) {
 				return;
 			}
 		} else {
-			logError("The current website is not a Social Club website and " + APP_NAME + " can't continue.", "window.location.href.indexOf(" + APP_LINK_SC_CHECK + ") === -1");
+			logError("The current website is not a Social Club website and " + APP_NAME + " can't continue.", "window.location.protocol !== \"https:\" || !window.location.host.endsWith(\"socialclub.rockstargames.com\"");
 
 			swal(
 				{
