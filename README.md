@@ -18,7 +18,7 @@ To use, add the following as the URL of a bookmark, then click it!
 **Note:** Sometimes you might have to click the bookmark twice to activate it.
 
 ```
-javascript:(function(){if(!document.getElementById("nt-mtjs")){var t=document.createElement("script");t.id="nt-mtjs",t.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/71b978b8fa6cab6e6114f100041919074a385ee5/scm.min.js",document.getElementsByTagName("head")[0].appendChild(t)}setTimeout(function(){try{Init("",1)}catch(t){alert("Social Club Utility Tool loading failed: Please try clicking your bookmark again.")}},1e3)})();
+javascript:(function(){if(!document.getElementById("nt-mtjs")){var t=document.createElement("script");t.id="nt-mtjs",t.src="https://cdn.rawgit.com/Senexis/Social-Club-Tool/4a91d9d7f785d0020a3bad0f620d3836f8d71ca9/scm.min.js",document.getElementsByTagName("head")[0].appendChild(t)}setTimeout(function(){try{Init("",1)}catch(t){alert("Social Club Utility Tool loading failed: Please try clicking your bookmark again.")}},1e3)})();
 ```
 
 *Last updated: January 16th, 2018.*
