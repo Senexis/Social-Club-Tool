@@ -5,7 +5,7 @@ function Init(friendMessage, checkBlocked) {
 	const APP_AUTHOR = "Senex";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
-	const APP_LINK_VERSIONS = "https://raw.githubusercontent.com/Senexis/Social-Club-Tool/master/v.json?callback";
+	const APP_LINK_VERSIONS = "https://senexis.github.io/Social-Club-Tool/v.json?callback";
 	const APP_LINK_SC = "https://" + window.location.host;
 
 	try {
