@@ -30,6 +30,5 @@ Parameter | Options | Usage
 --- | --- | ---
 `friendMessage` | `""` or `"Your message here."` | Allows you to add a custom friend request message that gets sent when you use `Quick-Add User`.
 `checkBlocked` | `0` or `1` | Allows you to enable or disable the blocked user check when using `Quick-Add User`.
-`debug` | `1` | Allows you to enable or disable debug output like Ajax request details and responses, `.pop()` objects, etc.
 
 **Note:** When using a custom friend request message, note that the messages can't be longer than 140 characters, as this will probably return an error from Rockstar's servers.
