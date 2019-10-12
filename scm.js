@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 23;
+	const APP_VERSION = 22;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -49,9 +49,9 @@ function Init(friendMessage, checkBlocked) {
 			text: body,
 
 			allowEscapeKey: false,
-			allowOutsideClick: false,
 			cancelButtonText: "No",
 			closeOnConfirm: false,
+			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "Yes",
 			html: true,
 			showCancelButton: true,
@@ -67,7 +67,6 @@ function Init(friendMessage, checkBlocked) {
 			title: title,
 			text: body,
 
-			allowEscapeKey: true,
 			allowOutsideClick: true,
 			html: true,
 			timer: timer
