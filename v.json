@@ -1,7 +1,7 @@
 {
     "released": true,
-    "version": 21,
+    "version": 99,
     "date": "October 12th, 2019",
-    "changes": "Fixed SCUT not loading|Improved styling to reflect recent Social Club changes|Prevent Rockstar updates from breaking the tool (hopefully)|Add notification if updates can't be fetched",
+    "changes": "Fixed SCUT not loading|Improved styling to reflect recent Social Club changes|Prevent Rockstar updates from breaking the tool (hopefully)|Fully automated updates, no more manual updating",
     "link": "https://senexis.github.io/Social-Club-Tool/scm.min.js?callback"
 }

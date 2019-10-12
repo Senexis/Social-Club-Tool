@@ -1,12 +1,12 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 21;
+	const APP_VERSION = 22;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
 	const APP_LINK = "https://github.com/Senexis/Social-Club-Tool";
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
-	const APP_LINK_VERSIONS = "https://senexis.github.io/Social-Club-Tool/v.json?callback";
 	const APP_LINK_SC = "https://" + window.location.host;
+	const APP_CLIENT_VERSION = localStorage.getItem('SCUT_CLIENT_VERSION');
 
 	try {
 		console.log.apply(console, ["%c " + APP_NAME + " %cv" + APP_VERSION + " by " + APP_AUTHOR + " %c " + APP_LINK, "background:#000000;color:#f90", "background:#000000;color:#ffffff", ""]);
@@ -107,45 +107,6 @@ function Init(friendMessage, checkBlocked) {
 	}
 
 	setTimeout(function () {
-		try {
-			$.getJSON(APP_LINK_VERSIONS, function (json) {
-				logRequest("Successfully fetched new updates.", this, json);
-			})
-				.success(function (json) {
-					if (json.released && json.version > APP_VERSION) {
-						swal(
-							getPersistentSwalArgs(
-								"warning",
-								"Update available!",
-								"<p>" + APP_NAME + " <strong>v" + json.version + "</strong> is now available!</p><p>It was released on " + json.date + " and contains the following changes:</p><ul><li>" + json.changes.replace(/\|/g, "</li><li>") + "</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
-							)
-						);
-					} else if (!json.released) {
-						logInfo("An update for " + APP_NAME + " was found but it wasn't released yet.", undefined);
-					} else {
-						logInfo("You are using the latest version of " + APP_NAME + "!", undefined);
-					}
-				})
-				.error(function (err) {
-					logRequest("Couldn't fetch new updates.", this, err);
-					$('#nt-cred').append("Couldn't get new updates, please check your AdBlocker(s) and try again. //");
-				});
-		} catch (err) {
-			if (err instanceof DOMException) {
-				logError("The jQuery library did not successfully load.", err);
-
-				swal(
-					getPersistentSwalArgs(
-						"error",
-						"Load unsuccessful",
-						APP_NAME + " did not load correctly. Please try clicking the bookmark again without refreshing the page."
-					)
-				);
-			} else {
-				logError("Couldn't run the update checker because something went wrong.", err);
-			}
-		}
-
 		if (window.location.protocol === "https:" && window.location.host.endsWith("socialclub.rockstargames.com")) {
 			try {
 				try {
@@ -184,7 +145,13 @@ function Init(friendMessage, checkBlocked) {
 					$('<a id="nt-daf" class="nt-button" href="javascript:void(0)">Delete all friends</a>').appendTo('#nt-root');
 					$('<a id="nt-raf" class="nt-button" href="javascript:void(0)">Reject all friend requests</a>').appendTo('#nt-root');
 					$('<a id="nt-qa" class="nt-button" href="javascript:void(0)">Quick-add user</a>').appendTo('#nt-root');
-					$('<div id="nt-cred"> // <a href="' + APP_LINK + '" target="_blank"><span style="color:#f7931e">' + APP_NAME + '</span> v' + APP_VERSION + ' by ' + APP_AUTHOR + '</a> // </div>').appendTo('#nt-root');
+					$('<div id="nt-cred"> // <a href="' + APP_LINK + '" target="_blank"><span style="color:#f7931e">' + APP_NAME + '</span> by ' + APP_AUTHOR + '</a> // v' + APP_VERSION + ' // </div>').appendTo('#nt-root');
+
+					if (APP_CLIENT_VERSION != APP_VERSION) {
+						// Display updated message.
+						$('#nt-cred').append('<span style="color:#f7931e">Updated automatically!</span> //')
+						localStorage.setItem('SCUT_CLIENT_VERSION', APP_VERSION);
+					}
 
 					// Data utility functions.
 					function DoGetRequest(object) {
