@@ -1,9 +1,7 @@
 # Social Club Tool
-
-*Now minified thanks to Matthias Mullie's [Minify](https://www.minifier.org/). That was long overdue.*
+Now minified thanks to [Javascript Minifier](https://javascript-minifier.com/).
 
 ## Functionality
-
 This small tool provides you with some useful additional functionality Social Club itself does not yet offer:
 
 - **Quick-add Users**: Allows you to send friend request to entered Social Club IDs instantly.
@@ -12,7 +10,6 @@ This small tool provides you with some useful additional functionality Social Cl
 - **Delete All Messages**: Allows you to remove ALL received and sent messages instantly.
 
 ## Usage
-
 To use, add the following as the URL of a bookmark, then click it!
 
 **Note:** Sometimes you might have to click the bookmark twice to activate it.
