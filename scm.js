@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 20;
+	const APP_VERSION = 21;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -109,7 +109,7 @@ function Init(friendMessage, checkBlocked) {
 	setTimeout(function () {
 		try {
 			$.getJSON(APP_LINK_VERSIONS, function (json) {
-				logRequest("Successfully fetched v.json in the update checker.", this, json);
+				logRequest("Successfully fetched new updates.", this, json);
 			})
 				.success(function (json) {
 					if (json.released && json.version > APP_VERSION) {
@@ -127,7 +127,8 @@ function Init(friendMessage, checkBlocked) {
 					}
 				})
 				.error(function (err) {
-					logRequest("Couldn't fetch v.json in the update checker.", this, err);
+					logRequest("Couldn't fetch new updates.", this, err);
+					$('#nt-cred').append("Couldn't get new updates, please check your AdBlocker(s) and try again. //");
 				});
 		} catch (err) {
 			if (err instanceof DOMException) {
@@ -178,7 +179,7 @@ function Init(friendMessage, checkBlocked) {
 					if (document.getElementById("nt-cred")) $("#nt-cred").remove();
 
 					// Add elements to the DOM.
-					$('<div id="nt-root"></div>').prependTo('#app-root')
+					$('<div id="nt-root"></div>').prependTo('body')
 					$('<a id="nt-dam" class="nt-button" href="javascript:void(0)">Delete all messages</a>').appendTo('#nt-root');
 					$('<a id="nt-daf" class="nt-button" href="javascript:void(0)">Delete all friends</a>').appendTo('#nt-root');
 					$('<a id="nt-raf" class="nt-button" href="javascript:void(0)">Reject all friend requests</a>').appendTo('#nt-root');
