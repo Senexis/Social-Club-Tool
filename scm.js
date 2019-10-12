@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 23;
+	const APP_VERSION = 24;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -765,11 +765,7 @@ function Init(friendMessage, checkBlocked) {
 
 								logInfo("Popped the items list in RemoveFriends().", item);
 
-								if (item.Relationship === "Friend") {
-									operation = "delete";
-								} else if (item.Relationship === "InvitedByMe") {
-									operation = "cancel";
-								} else if (item.Relationship === "InvitedByThem") {
+								if (item.Relationship === "InvitedByThem") {
 									operation = "ignore";
 								} else {
 									logError("An item has been skipped.", "No operation is possible for " + item.Name + ".");
