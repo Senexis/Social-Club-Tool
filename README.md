@@ -15,7 +15,7 @@ To use, add the following as the URL of a bookmark, then click it!
 **Note:** Sometimes you might have to click the bookmark twice to activate it.
 
 ```
-javascript:(function(){if(!document.getElementById("nt-mtjs")){var t=document.createElement("script");t.id="nt-mtjs",t.src="https://senexis.github.io/Social-Club-Tool/scm.min.js?callback",document.getElementsByTagName("head")[0].appendChild(t)}setTimeout(function(){try{Init("",1)}catch(t){alert("Social Club Utility Tool loading failed: Please try clicking your bookmark again.")}},1e3)})();
+javascript:(function(){if(!document.getElementById("nt-mtjs")){var t=document.createElement("script");t.id="nt-mtjs",t.src="https://senexis.github.io/Social-Club-Tool/scm.min.js?"+(new Date).getTime(),document.getElementsByTagName("head")[0].appendChild(t)}setTimeout(function(){try{Init("",1)}catch(t){alert("Social Club Utility Tool loading failed: Please try clicking your bookmark again.")}},1e3)})();
 ```
 
 *Last updated: October 12th, 2019.*
