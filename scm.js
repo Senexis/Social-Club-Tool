@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 22;
+	const APP_VERSION = 23;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -49,9 +49,9 @@ function Init(friendMessage, checkBlocked) {
 			text: body,
 
 			allowEscapeKey: false,
+			allowOutsideClick: false,
 			cancelButtonText: "No",
 			closeOnConfirm: false,
-			confirmButtonColor: "#DD6B55",
 			confirmButtonText: "Yes",
 			html: true,
 			showCancelButton: true,
@@ -67,6 +67,7 @@ function Init(friendMessage, checkBlocked) {
 			title: title,
 			text: body,
 
+			allowEscapeKey: true,
 			allowOutsideClick: true,
 			html: true,
 			timer: timer
@@ -129,7 +130,7 @@ function Init(friendMessage, checkBlocked) {
 
 				if (userNickname != "" && isLoggedIn) {
 					// Insert custom styling.
-					$('<style>#nt-root{z-index:999;position:fixed;bottom:0;left:0;right:0;text-align:center;background-color:rgba(0,0,0,.9);padding:.5rem}#nt-cred{color:white;border-top:solid 1px #333;padding:.5rem 0;margin-top:.5rem}#nt-cred a{color:white}#nt-update{padding:.5em;width:100%;height:10em;border:2px solid #f90;text-align:center;resize:none;background:0 0;cursor:initial}.nt-button{background:linear-gradient(90deg,#f7931e,#fcaf17);border-color:#fcaf17;border-radius:3px;border-style:solid;border-width:1px;color:#fff;cursor:pointer;display:inline-block;font-family:-apple-system,BlinkMacSystemFont,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem;font-weight:700;line-height:2.25rem;padding:0 1.25rem;margin-right:.5rem;text-align:center;text-decoration:none;text-shadow:0 1px 1px rgba(26,26,26,.2);vertical-align:bottom}.nt-button:active:not(:disabled),.nt-button:hover:not(:disabled){background:#fcaf17}.sweet-alert p{margin:12px 0!important}.sweet-alert strong{font-weight:700!important}.sweet-alert ul{list-style:outside}.sweet-alert fieldset{display:none}.sweet-alert.show-input fieldset{display:block}.sweet-alert .sa-input-error{top:40px}</style>').appendTo('head');
+					$('<style>#nt-root{z-index:999;position:fixed;bottom:0;left:0;right:0;text-align:center;background-color:rgba(0,0,0,.9);padding:.5rem}#nt-cred{color:white;border-top:solid 1px #333;padding:.5rem 0;margin-top:.5rem}#nt-cred a{color:white}#nt-update{padding:.5em;width:100%;height:10em;border:2px solid #f90;text-align:center;resize:none;background:0 0;cursor:initial}.sweet-alert button,.sweet-alert button.cancel,.nt-button{background:linear-gradient(90deg,#f7931e,#fcaf17)!important;border-color:#fcaf17!important;border-radius:3px;border-style:solid;border-width:1px;box-shadow:none!important;color:#fff;cursor:pointer;display:inline-block!important;font-family:-apple-system,BlinkMacSystemFont,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem;font-weight:700;line-height:2.25rem;padding:0 1.25rem;margin-right:.5rem;text-align:center;text-decoration:none;text-shadow:0 1px 1px rgba(26,26,26,.2);vertical-align:bottom}.sweet-alert button.cancel{background:linear-gradient(90deg,#aaa,#ccc)!important;border-color:#ccc!important}.sweet-alert button:active:not(:disabled),.sweet-alert button:hover:not(:disabled),.nt-button:active:not(:disabled),.nt-button:hover:not(:disabled){background:#fcaf17!important}.sweet-alert button.cancel:active:not(:disabled),.sweet-alert button.cancel:hover:not(:disabled){background:#ccc!important}.sweet-alert{background-color:#333;color:white}.sweet-alert p,.sweet-alert h2{color:white}.sweet-alert p{margin:12px 0!important}.sweet-alert strong{font-weight:700!important}.sweet-alert ul{list-style:outside}.sweet-alert fieldset{display:none}.sweet-alert.show-input fieldset{display:block}.sweet-alert input{background:transparent;border:solid 3px white;border-radius:.5rem;color:white}.sweet-alert input:focus{outline:0;background:rgba(255,255,255,.1);border:solid 3px white;box-shadow:none!important}.sweet-alert .sa-input-error{top:27px}.sweet-alert .sa-error-container{background:transparent!important}</style>').appendTo('head');
 
 					// Remove elements if they exist already.
 					if (document.getElementById("nt-root")) $("#nt-root").remove();
