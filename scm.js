@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 18;
+	const APP_VERSION = 20;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -111,24 +111,24 @@ function Init(friendMessage, checkBlocked) {
 			$.getJSON(APP_LINK_VERSIONS, function (json) {
 				logRequest("Successfully fetched v.json in the update checker.", this, json);
 			})
-			.success(function (json) {
-				if (json.released && json.version > APP_VERSION) {
-					swal(
-						getPersistentSwalArgs(
-							"warning",
-							"Update available!",
-							"<p>" + APP_NAME + " <strong>v" + json.version + "</strong> is now available!</p><p>It was released on " + json.date + " and contains the following changes:</p><ul><li>" + json.changes.replace(/\|/g, "</li><li>") + "</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
-						)
-					);
-				} else if (!json.released) {
-					logInfo("An update for " + APP_NAME + " was found but it wasn't released yet.", undefined);
-				} else {
-					logInfo("You are using the latest version of " + APP_NAME + "!", undefined);
-				}
-			})
-			.error(function (err) {
-				logRequest("Couldn't fetch v.json in the update checker.", this, err);
-			});
+				.success(function (json) {
+					if (json.released && json.version > APP_VERSION) {
+						swal(
+							getPersistentSwalArgs(
+								"warning",
+								"Update available!",
+								"<p>" + APP_NAME + " <strong>v" + json.version + "</strong> is now available!</p><p>It was released on " + json.date + " and contains the following changes:</p><ul><li>" + json.changes.replace(/\|/g, "</li><li>") + "</li></ul><p>Update your bookmark to the following:</p><textarea id=\"nt-update\" readonly=\"readonly\">javascript:(function(){if(!document.getElementById(\"nt-mtjs\")){var t=document.createElement(\"script\");t.id=\"nt-mtjs\",t.src=\"" + json.link + "\",document.getElementsByTagName(\"head\")[0].appendChild(t)}setTimeout(function(){try{Init(\"" + friendMessage + "\"," + checkBlocked + ")}catch(t){alert(\"" + APP_NAME + " loading failed: Please try clicking your bookmark again.\")}},1e3)})();</textarea>"
+							)
+						);
+					} else if (!json.released) {
+						logInfo("An update for " + APP_NAME + " was found but it wasn't released yet.", undefined);
+					} else {
+						logInfo("You are using the latest version of " + APP_NAME + "!", undefined);
+					}
+				})
+				.error(function (err) {
+					logRequest("Couldn't fetch v.json in the update checker.", this, err);
+				});
 		} catch (err) {
 			if (err instanceof DOMException) {
 				logError("The jQuery library did not successfully load.", err);
@@ -167,9 +167,10 @@ function Init(friendMessage, checkBlocked) {
 
 				if (userNickname != "" && isLoggedIn) {
 					// Insert custom styling.
-					$('<style>#nt-daf,#nt-dam,#nt-qa,#nt-raf{margin-bottom:8px;margin-right:5px}#nt-update{padding:.5em;width:100%;height:10em;border:2px solid #f90;text-align:center;resize:none;background:0 0;cursor:initial}.sweet-alert p{margin:12px 0!important}.sweet-alert strong{font-weight:700!important}.sweet-alert ul{list-style:outside}.sweet-alert fieldset{display:none}.sweet-alert.show-input fieldset{display:block}.sweet-alert .sa-input-error{top:40px}</style>').appendTo('head');
+					$('<style>#nt-root{z-index:999;position:fixed;bottom:0;left:0;right:0;text-align:center;background-color:rgba(0,0,0,.9);padding:.5rem}#nt-cred{color:white;border-top:solid 1px #333;padding:.5rem 0;margin-top:.5rem}#nt-cred a{color:white}#nt-update{padding:.5em;width:100%;height:10em;border:2px solid #f90;text-align:center;resize:none;background:0 0;cursor:initial}.nt-button{background:linear-gradient(90deg,#f7931e,#fcaf17);border-color:#fcaf17;border-radius:3px;border-style:solid;border-width:1px;color:#fff;cursor:pointer;display:inline-block;font-family:-apple-system,BlinkMacSystemFont,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;font-size:1rem;font-weight:700;line-height:2.25rem;padding:0 1.25rem;margin-right:.5rem;text-align:center;text-decoration:none;text-shadow:0 1px 1px rgba(26,26,26,.2);vertical-align:bottom}.nt-button:active:not(:disabled),.nt-button:hover:not(:disabled){background:#fcaf17}.sweet-alert p{margin:12px 0!important}.sweet-alert strong{font-weight:700!important}.sweet-alert ul{list-style:outside}.sweet-alert fieldset{display:none}.sweet-alert.show-input fieldset{display:block}.sweet-alert .sa-input-error{top:40px}</style>').appendTo('head');
 
 					// Remove elements if they exist already.
+					if (document.getElementById("nt-root")) $("#nt-root").remove();
 					if (document.getElementById("nt-dam")) $("#nt-dam").remove();
 					if (document.getElementById("nt-daf")) $("#nt-daf").remove();
 					if (document.getElementById("nt-raf")) $("#nt-raf").remove();
@@ -177,11 +178,12 @@ function Init(friendMessage, checkBlocked) {
 					if (document.getElementById("nt-cred")) $("#nt-cred").remove();
 
 					// Add elements to the DOM.
-					$('<a id="nt-dam" class="btn btnGold btnRounded" href="javascript:void(0)">delete all messages</a>').prependTo('#page');
-					$('<a id="nt-daf" class="btn btnGold btnRounded" href="javascript:void(0)">delete all friends</a>').prependTo('#page');
-					$('<a id="nt-raf" class="btn btnGold btnRounded" href="javascript:void(0)">reject all friend requests</a>').prependTo('#page');
-					$('<a id="nt-qa" class="btn btnGold btnRounded" href="javascript:void(0)">quick-add user</a>').prependTo('#page');
-					$('<li id="nt-cred"> // <a href="' + APP_LINK + '" target="_blank"><span style="color:#f90">' + APP_NAME + '</span> v' + APP_VERSION + ' by ' + APP_AUTHOR + '</a> // </li>').appendTo('#footerNav');
+					$('<div id="nt-root"></div>').prependTo('#app-root')
+					$('<a id="nt-dam" class="nt-button" href="javascript:void(0)">Delete all messages</a>').appendTo('#nt-root');
+					$('<a id="nt-daf" class="nt-button" href="javascript:void(0)">Delete all friends</a>').appendTo('#nt-root');
+					$('<a id="nt-raf" class="nt-button" href="javascript:void(0)">Reject all friend requests</a>').appendTo('#nt-root');
+					$('<a id="nt-qa" class="nt-button" href="javascript:void(0)">Quick-add user</a>').appendTo('#nt-root');
+					$('<div id="nt-cred"> // <a href="' + APP_LINK + '" target="_blank"><span style="color:#f7931e">' + APP_NAME + '</span> v' + APP_VERSION + ' by ' + APP_AUTHOR + '</a> // </div>').appendTo('#nt-root');
 
 					// Data utility functions.
 					function DoGetRequest(object) {
@@ -197,7 +199,7 @@ function Init(friendMessage, checkBlocked) {
 							xhr: function () {
 								var xhr = jQuery.ajaxSettings.xhr();
 								var setRequestHeader = xhr.setRequestHeader;
-								
+
 								xhr.setRequestHeader = function (name, value) {
 									if (name == 'X-Requested-With') return;
 									setRequestHeader.call(this, name, value);
@@ -223,7 +225,7 @@ function Init(friendMessage, checkBlocked) {
 							xhr: function () {
 								var xhr = jQuery.ajaxSettings.xhr();
 								var setRequestHeader = xhr.setRequestHeader;
-								
+
 								xhr.setRequestHeader = function (name, value) {
 									if (name == 'X-Requested-With') return;
 									setRequestHeader.call(this, name, value);
@@ -275,7 +277,7 @@ function Init(friendMessage, checkBlocked) {
 															"No messages",
 															"There were no messages to delete."
 														)
-													); 
+													);
 												}
 											}
 										});
@@ -449,93 +451,93 @@ function Init(friendMessage, checkBlocked) {
 								showCancelButton: true,
 								showLoaderOnConfirm: true
 							},
-							function (inputValue) {
-								if (inputValue === false) return false;
-								inputValue = inputValue.trim();
+								function (inputValue) {
+									if (inputValue === false) return false;
+									inputValue = inputValue.trim();
 
-								if (inputValue === "") {
-									swal.showInputError("The username field can't be empty.");
-									return false
-								}
+									if (inputValue === "") {
+										swal.showInputError("The username field can't be empty.");
+										return false
+									}
 
-								if (inputValue.match(new RegExp("([^A-Za-z0-9-_\.])"))) {
-									swal.showInputError("The username field contains invalid characters.");
-									return false
-								}
+									if (inputValue.match(new RegExp("([^A-Za-z0-9-_\.])"))) {
+										swal.showInputError("The username field contains invalid characters.");
+										return false
+									}
 
-								if (inputValue.length < 6) {
-									swal.showInputError("The username field can't be shorter than 6 characters.");
-									return false
-								}
+									if (inputValue.length < 6) {
+										swal.showInputError("The username field can't be shorter than 6 characters.");
+										return false
+									}
 
-								if (inputValue.length > 16) {
-									swal.showInputError("The username field can't be longer than 16 characters.");
-									return false
-								}
+									if (inputValue.length > 16) {
+										swal.showInputError("The username field can't be longer than 16 characters.");
+										return false
+									}
 
-								if (inputValue.toLowerCase() === userNickname.toLowerCase()) {
-									swal.showInputError("You can't add yourself as a friend.");
-									return false
-								}
+									if (inputValue.toLowerCase() === userNickname.toLowerCase()) {
+										swal.showInputError("You can't add yourself as a friend.");
+										return false
+									}
 
-								DoGetRequest({
-									url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname=" + inputValue + "&full=false",
-									error: function (err) {
-										logRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, err);
+									DoGetRequest({
+										url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname=" + inputValue + "&full=false",
+										error: function (err) {
+											logRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, err);
 
-										swal(
-											getTimedSwalArgs(
-												"error",
-												err.status + " - " + err.statusText,
-												"Something went wrong while trying to check whether <strong>" + inputValue + "</strong> exists or not."
-											)
-										);
-									},
-									success: function (data) {
-										logRequest("Successfully fetched the account details of " + inputValue + " in #nt-qa_click.", this, data);
-
-										if (data.Status == true) {
-											if (data.Relation == "Friend") {
-												swal(
-													getTimedSwalArgs(
-														"success",
-														"Already added",
-														"<strong>" + inputValue + "</strong> is already your friend."
-													)
-												);
-											} else {
-												if (data.AllowAddFriend == true) {
-													if (checkBlocked) {
-														RetrieveBlockedList(data);
-													} else {
-														AddFriend(data);
-													}
-												} else {
-													if (data.AllowAcceptFriend == true) {
-														AcceptFriend(data);
-													} else {
-														swal(
-															getTimedSwalArgs(
-																"error",
-																"Can't send request",
-																"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
-															)
-														);
-													}
-												}
-											}
-										} else {
 											swal(
 												getTimedSwalArgs(
 													"error",
-													"User not found",
-													"The nickname <strong>" + inputValue + "</strong> doesn't exist."
+													err.status + " - " + err.statusText,
+													"Something went wrong while trying to check whether <strong>" + inputValue + "</strong> exists or not."
 												)
 											);
+										},
+										success: function (data) {
+											logRequest("Successfully fetched the account details of " + inputValue + " in #nt-qa_click.", this, data);
+
+											if (data.Status == true) {
+												if (data.Relation == "Friend") {
+													swal(
+														getTimedSwalArgs(
+															"success",
+															"Already added",
+															"<strong>" + inputValue + "</strong> is already your friend."
+														)
+													);
+												} else {
+													if (data.AllowAddFriend == true) {
+														if (checkBlocked) {
+															RetrieveBlockedList(data);
+														} else {
+															AddFriend(data);
+														}
+													} else {
+														if (data.AllowAcceptFriend == true) {
+															AcceptFriend(data);
+														} else {
+															swal(
+																getTimedSwalArgs(
+																	"error",
+																	"Can't send request",
+																	"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
+																)
+															);
+														}
+													}
+												}
+											} else {
+												swal(
+													getTimedSwalArgs(
+														"error",
+														"User not found",
+														"The nickname <strong>" + inputValue + "</strong> doesn't exist."
+													)
+												);
+											}
 										}
-									}
+									});
 								});
-							});
 						} catch (err) {
 							logError("Something went wrong in #nt-qa_click.", err);
 							return false;
@@ -763,7 +765,7 @@ function Init(friendMessage, checkBlocked) {
 
 									var status = errorObjects.length === 0 ? "success" : "warning";
 									var timer = errorObjects.length === 0 ? 5000 : 60000;
-									var errorObjectsString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ( ( i === errorObjects.length - 2 ) ? ' and ' : ', ' ) }, '').slice(0, -2);
+									var errorObjectsString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ((i === errorObjects.length - 2) ? ' and ' : ', ') }, '').slice(0, -2);
 
 									if (isFriendRequestLoop) {
 										swal(

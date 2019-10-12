@@ -1,1 +1,7 @@
-{"released":true,"version":18,"date":"January 16th, 2018","changes":"Improved performance quite a bit|Check for updates even when not logged in on Social Club|Fix loading the tool on language other than English|Improved error logging and clarified some things|A lot of bug fixes and improvements","link":"https://cdn.rawgit.com/Senexis/Social-Club-Tool/6e820b546a2e3d5f4047777309f5fdde0b46cd02/scm.min.js"}
+{
+    "released": false,
+    "version": 20,
+    "date": "October 12th, 2019",
+    "changes": "Fixed SCUT not loading|Improved styling to reflect recent Social Club changes|Welcome back!",
+    "link": "https://senexis.github.io/Social-Club-Tool/scm.min.js"
+}
