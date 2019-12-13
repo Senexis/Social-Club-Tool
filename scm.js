@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 25;
+	const APP_VERSION = 26;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -19,19 +19,26 @@ function Init(friendMessage, checkBlocked) {
 
 	if (checkBlocked === undefined) checkBlocked = 1;
 
-	function logInfo(title, body) {
+	// Generic helper functions.
+	function GetCookie(name) {
+		var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+		return v ? v[2] : null;
+	}
+
+	// UI utility functions.
+	function LogInfo(title, body) {
 		console.groupCollapsed("[" + APP_NAME_SHORT + ": INFO] " + title);
 		console.log(body);
 		console.groupEnd();
 	}
 
-	function logError(title, body) {
+	function LogError(title, body) {
 		console.groupCollapsed("[" + APP_NAME_SHORT + ": ERROR] " + title);
 		console.error(body);
 		console.groupEnd();
 	}
 
-	function logRequest(title, request, response) {
+	function LogRequest(title, request, response) {
 		console.groupCollapsed("[" + APP_NAME_SHORT + ": AJAX] " + title);
 		console.group("Request");
 		console.log(request);
@@ -42,7 +49,7 @@ function Init(friendMessage, checkBlocked) {
 		console.groupEnd();
 	}
 
-	function getYesNoSwalArgs(type, title, body) {
+	function GetYesNoSwalArgs(type, title, body) {
 		return {
 			type: type,
 			title: title,
@@ -59,7 +66,7 @@ function Init(friendMessage, checkBlocked) {
 		};
 	}
 
-	function getTimedSwalArgs(type, title, body, timer) {
+	function GetTimedSwalArgs(type, title, body, timer) {
 		if (timer === undefined) timer = 5000;
 
 		return {
@@ -73,7 +80,7 @@ function Init(friendMessage, checkBlocked) {
 		};
 	}
 
-	function getPersistentSwalArgs(type, title, body) {
+	function GetPersistentSwalArgs(type, title, body) {
 		return {
 			type: type,
 			title: title,
@@ -102,7 +109,7 @@ function Init(friendMessage, checkBlocked) {
 		sajs.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
 		document.getElementsByTagName('head')[0].appendChild(sajs);
 	} catch (err) {
-		logError("Something went wrong while trying to load the necessary scripts.", err);
+		LogError("Something went wrong while trying to load the necessary scripts.", err);
 		return;
 	}
 
@@ -114,10 +121,10 @@ function Init(friendMessage, checkBlocked) {
 					var userNickname = siteMaster.authUserNickName;
 					var isLoggedIn = siteMaster.isLoggedIn;
 				} catch (err) {
-					logError("Could not fetch all necessary account data because something went wrong.", err);
+					LogError("Could not fetch all necessary account data because something went wrong.", err);
 
 					swal(
-						getPersistentSwalArgs(
+						GetPersistentSwalArgs(
 							"error",
 							"An error occured",
 							"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to retrieve the required account data. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
@@ -153,8 +160,112 @@ function Init(friendMessage, checkBlocked) {
 						localStorage.setItem('SCUT_CLIENT_VERSION', APP_VERSION);
 					}
 
+					// Add click listeners to the different elements.
+					$("#nt-dam").click(function (e) {
+						e.preventDefault();
+
+						try {
+							swal(
+								GetYesNoSwalArgs(
+									"warning",
+									"Are you sure?",
+									"<p>All messages will be deleted from your inbox.</p><p>This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.</p><p><strong class=\"nt-swal-retrieving\" style=\"display:none;\">Retrieving <span class=\"nt-swal-retrieving-text\">conversation list</span>...</strong></p><p><strong class=\"nt-swal-progress\" style=\"display:none;\"><span class=\"nt-swal-progress-current\">0</span> of <span class=\"nt-swal-progress-total\">0</span> message(s) remaining...</strong></p>"
+								),
+								function (isConfirm) {
+									if (isConfirm) {
+										RemoveMessagesAction();
+									} else {
+										return false;
+									}
+								}
+							);
+						} catch (err) {
+							LogError("Something went wrong in #nt-dam_click.", err);
+							return false;
+						}
+
+						return false;
+					});
+
+					$("#nt-raf").click(function (e) {
+						e.preventDefault();
+
+						try {
+							swal(
+								GetYesNoSwalArgs(
+									"warning",
+									"Are you sure?",
+									"<p>All friend requests you have received will be rejected.</p><p>This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.</p><p><strong class=\"nt-swal-progress\" style=\"display:none;\"><span class=\"nt-swal-progress-current\">0</span> of <span class=\"nt-swal-progress-total\">0</span> friend request(s) remaining...</strong></p>"
+								),
+								function (isConfirm) {
+									if (isConfirm) {
+										RemoveFriendRequestsAction();
+									} else {
+										return false;
+									}
+								}
+							);
+						} catch (err) {
+							LogError("Something went wrong in #nt-raf_click.", err);
+							return false;
+						}
+
+						return false;
+					});
+
+					$("#nt-daf").click(function (e) {
+						e.preventDefault();
+
+						try {
+							swal(
+								GetYesNoSwalArgs(
+									"warning",
+									"Are you sure?",
+									"<p>All friends will be removed from your friend list.<p></p>This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.</p><p><strong class=\"nt-swal-retrieving\" style=\"display:none;\">Retrieving friends...</strong></p><p><strong class=\"nt-swal-progress\" style=\"display:none;\"><span class=\"nt-swal-progress-current\">0</span> of <span class=\"nt-swal-progress-total\">0</span> friend(s) remaining...</strong></p>",
+								),
+								function (isConfirm) {
+									if (isConfirm) {
+										RemoveFriendsAction();
+									} else {
+										return false;
+									}
+								}
+							);
+						} catch (err) {
+							LogError("Something went wrong in #nt-daf_click.", err);
+							return false;
+						}
+
+						return false;
+					});
+
+					$("#nt-qa").click(function (e) {
+						e.preventDefault();
+
+						try {
+							swal({
+								type: "input",
+								title: "Enter username",
+								text: '<p>Please enter the Social Club username you want to add. When you click "Add", the user will automatically be added if it exists.</p>' + (checkBlocked ? "" : "<p><strong>Note:</strong> You have disabled the blocked users list check. If the user is on your blocked users list, they will be unblocked and sent a friend request.</p>") + (friendMessage == "" ? "" : "<p><strong>Note:</strong> You have set a custom friend request message, which will get sent to the user.</p>"),
+
+								allowEscapeKey: false,
+								closeOnConfirm: false,
+								confirmButtonText: "Add",
+								html: true,
+								inputPlaceholder: "Social Club username",
+								showCancelButton: true,
+								showLoaderOnConfirm: true
+							}, (inputValue) => QuickAddAction(inputValue));
+						} catch (err) {
+							LogError("Something went wrong in #nt-qa_click.", err);
+							return false;
+						}
+
+						return false;
+					});
+
 					// Data utility functions.
-					function DoGetRequest(object) {
+					function DoLegacyGetRequest(object) {
 						$.ajax({
 							url: object.url,
 							error: object.error,
@@ -178,7 +289,7 @@ function Init(friendMessage, checkBlocked) {
 						});
 					}
 
-					function DoDataRequest(object) {
+					function DoLegacyDataRequest(object) {
 						$.ajax({
 							url: object.url,
 							data: JSON.stringify(object.data),
@@ -204,315 +315,284 @@ function Init(friendMessage, checkBlocked) {
 						});
 					}
 
-					// Add click listeners to the different elements.
-					$("#nt-dam").click(function (e) {
-						e.preventDefault();
-
+					function DoRequest(object) {
 						try {
-							swal(
-								getYesNoSwalArgs(
-									"warning",
-									"Are you sure?",
-									"<p>All messages will be deleted from your inbox.</p><p>This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.</p><p><strong id=\"nt-dam-retrieving\" style=\"display:none;\">Retrieving <span id=\"nt-dam-retrieving-text\">conversation list</span>...</strong></p><p><strong id=\"nt-dam-progress\" style=\"display:none;\"><span id=\"nt-dam-progress-current\">0</span> of <span id=\"nt-dam-progress-total\">0</span> message(s) remaining...</strong></p>"
-								),
-								function (isConfirm) {
-									if (isConfirm) {
-										DoGetRequest({
-											url: APP_LINK_SC + "/Message/GetMessageCount",
-											error: function (err) {
-												logRequest("Couldn't fetch the total message count in #nt-dam_click.", this, err);
-
-												swal(
-													getTimedSwalArgs(
-														"error",
-														err.status + " - " + err.statusText,
-														"Something went wrong while trying to fetch the total amount of messages."
-													)
-												);
-											},
-											success: function (data) {
-												logRequest("Successfully fetched the total message count in #nt-dam_click.", this, data);
-
-												if (data.Total > 0) {
-													$('#nt-dam-progress-current').text(data.Total);
-													$('#nt-dam-progress-total').text(data.Total);
-													$('#nt-dam-retrieving').show()
-													RetrieveAllMessageUsers([]);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"No messages",
-															"There were no messages to delete."
-														)
-													);
-												}
-											}
-										});
-									} else {
-										return false;
-									}
+							var bearerToken = GetCookie(siteMaster.scauth.tokenCookieName);
+							var scApiRequestOptions = {
+								method: object.method,
+								credentials: 'same-origin',
+								cache: 'default',
+								mode: 'cors',
+								headers: {
+									'X-Requested-With': 'XMLHttpRequest',
+									'X-Lang': 'en-US',
+									'X-Cache-Ver': '10',
+									'Authorization': `Bearer ${bearerToken}`
 								}
-							);
-						} catch (err) {
-							logError("Something went wrong in #nt-dam_click.", err);
-							return false;
+							};
+
+							fetch(object.url, scApiRequestOptions)
+								.then(response => response.json())
+								.then(json => object.success(json))
+								.catch(error => object.error(error))
+						} catch (error) {
+							object.error(error);
 						}
+					}
 
-						return false;
-					});
+					// Action functions.
+					function RemoveMessagesAction() {
+						DoLegacyGetRequest({
+							url: APP_LINK_SC + "/Message/GetMessageCount",
+							error: function (err) {
+								LogRequest("Couldn't fetch the total message count in #nt-dam_click.", this, err);
 
-					$("#nt-raf").click(function (e) {
-						e.preventDefault();
-
-						try {
-							swal(
-								getYesNoSwalArgs(
-									"warning",
-									"Are you sure?",
-									"<p>All friend requests you have received will be rejected.</p><p>This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.</p><p><strong id=\"nt-raf-progress\" style=\"display:none;\"><span id=\"nt-raf-progress-current\">0</span> of <span id=\"nt-raf-progress-total\">0</span> friend request(s) remaining...</strong></p>"
-								),
-								function (isConfirm) {
-									if (isConfirm) {
-										var children = [];
-
-										DoGetRequest({
-											url: APP_LINK_SC + "/friends/GetReceivedInvitesJson",
-											error: function (err) {
-												logRequest("Couldn't fetch the total received invites count in #nt-raf_click.", this, err);
-
-												swal(
-													getTimedSwalArgs(
-														"error",
-														err.status + " - " + err.statusText,
-														"Something went wrong while trying to fetch the total amount of friend requests."
-													)
-												);
-											},
-											success: function (data) {
-												logRequest("Successfully fetched the total received invites count in #nt-raf_click.", this, data);
-
-												if (data.Status == true && data.TotalCount > 0) {
-													$('#nt-raf-progress-current').text(data.TotalCount);
-													$('#nt-raf-progress-total').text(data.TotalCount);
-													$('#nt-raf-progress').show();
-
-													data.RockstarAccounts.forEach(function (e) {
-														children.push(e);
-													});
-
-													if (children.length == data.TotalCount) {
-														RemoveFriends(children, true);
-													};
-												} else if (data.Status == true && data.TotalCount == 0) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"No friend requests",
-															"There were no friend requests to reject."
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"error",
-															"Something went wrong",
-															"Something went wrong while trying to fetch friend request data."
-														)
-													);
-												}
-											}
-										});
-									} else {
-										return false;
-									}
-								}
-							);
-						} catch (err) {
-							logError("Something went wrong in #nt-raf_click.", err);
-							return false;
-						}
-
-						return false;
-					});
-
-					$("#nt-daf").click(function (e) {
-						e.preventDefault();
-
-						try {
-							swal(
-								getYesNoSwalArgs(
-									"warning",
-									"Are you sure?",
-									"<p>All friends will be removed from your friend list.<p></p>This process may take up to several minutes. Please be patient for it to be completed before browsing away from this page.</p><p><strong id=\"nt-daf-retrieving\" style=\"display:none;\">Retrieving friends...</strong></p><p><strong id=\"nt-daf-progress\" style=\"display:none;\"><span id=\"nt-daf-progress-current\">0</span> of <span id=\"nt-daf-progress-total\">0</span> friend(s) remaining...</strong></p>",
-								),
-								function (isConfirm) {
-									if (isConfirm) {
-										DoGetRequest({
-											url: APP_LINK_SC + "/friends/GetFriendsAndInvitesSentJson?pageNumber=0&onlineService=sc&pendingInvitesOnly=false",
-											error: function (err) {
-												logRequest("Couldn't fetch the friends and invites sent list in #nt-daf_click.", this, err);
-
-												swal(
-													getTimedSwalArgs(
-														"error",
-														err.status + " - " + err.statusText,
-														"Something went wrong while trying to fetch the total amount of friends."
-													)
-												);
-											},
-											success: function (data) {
-												logRequest("Successfully fetched the friends and invites sent list in #nt-daf_click.", this, data);
-
-												if (data.Status == true && data.TotalCount > 0) {
-													$('#nt-daf-progress-current').text(data.TotalCount);
-													$('#nt-daf-progress-total').text(data.TotalCount);
-													$('#nt-daf-retrieving').show();
-
-													RetrieveAllFriends([]);
-												} else if (data.Status == true && data.TotalCount == 0) {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"No friends",
-															"There were no friends to delete."
-														)
-													);
-												} else {
-													swal(
-														getTimedSwalArgs(
-															"error",
-															"Something went wrong",
-															"Something went wrong while trying to fetch friend data."
-														)
-													);
-												}
-											}
-										});
-									} else {
-										return false;
-									}
-								}
-							);
-						} catch (err) {
-							logError("Something went wrong in #nt-daf_click.", err);
-							return false;
-						}
-
-						return false;
-					});
-
-					$("#nt-qa").click(function (e) {
-						e.preventDefault();
-
-						try {
-							swal({
-								type: "input",
-								title: "Enter username",
-								text: '<p>Please enter the Social Club username you want to add. When you click "Add", the user will automatically be added if it exists.</p>' + (checkBlocked ? "" : "<p><strong>Note:</strong> You have disabled the blocked users list check. If the user is on your blocked users list, they will be unblocked and sent a friend request.</p>") + (friendMessage == "" ? "" : "<p><strong>Note:</strong> You have set a custom friend request message, which will get sent to the user.</p>"),
-
-								allowEscapeKey: false,
-								closeOnConfirm: false,
-								confirmButtonText: "Add",
-								html: true,
-								inputPlaceholder: "Social Club username",
-								showCancelButton: true,
-								showLoaderOnConfirm: true
+								swal(
+									GetTimedSwalArgs(
+										"error",
+										err.status + " - " + err.statusText,
+										"Something went wrong while trying to fetch the total amount of messages."
+									)
+								);
 							},
-								function (inputValue) {
-									if (inputValue === false) return false;
-									inputValue = inputValue.trim();
+							success: function (data) {
+								LogRequest("Successfully fetched the total message count in #nt-dam_click.", this, data);
 
-									if (inputValue === "") {
-										swal.showInputError("The username field can't be empty.");
-										return false
-									}
+								if (data.Total > 0) {
+									$('.nt-swal-progress-current').text(data.Total);
+									$('.nt-swal-progress-total').text(data.Total);
+									$('.nt-swal-retrieving').show()
+									RetrieveAllMessageUsers([]);
+								} else {
+									swal(
+										GetTimedSwalArgs(
+											"success",
+											"No messages",
+											"There were no messages to delete."
+										)
+									);
+								}
+							}
+						});
+					}
 
-									if (inputValue.match(new RegExp("([^A-Za-z0-9-_\.])"))) {
-										swal.showInputError("The username field contains invalid characters.");
-										return false
-									}
+					function RemoveFriendsAction() {
+						var pageIndex = 0;
+						var pageSize = 12;
 
-									if (inputValue.length < 6) {
-										swal.showInputError("The username field can't be shorter than 6 characters.");
-										return false
-									}
+						DoRequest({
+							url: `${siteMaster.scApiBase}/friends/getFriendsFiltered?onlineService=sc&nickname=&pageIndex=${pageIndex}&pageSize=${pageSize}`,
+							method: 'GET',
+							success: function (json) {
+								LogRequest("Successfully fetched the friends list in #nt-daf_click.", this, json);
 
-									if (inputValue.length > 16) {
-										swal.showInputError("The username field can't be longer than 16 characters.");
-										return false
-									}
+								if (json.status == true && json.rockstarAccountList.total > 0) {
+									$('.nt-swal-progress-current').text(json.rockstarAccountList.total);
+									$('.nt-swal-progress-total').text(json.rockstarAccountList.total);
+									$('.nt-swal-retrieving').show();
 
-									if (inputValue.toLowerCase() === userNickname.toLowerCase()) {
-										swal.showInputError("You can't add yourself as a friend.");
-										return false
-									}
+									RetrieveRockstarAccounts(`${siteMaster.scApiBase}/friends/getFriendsFiltered`, `${siteMaster.scApiBase}/friends/remove`, function (errorObjects) {
+										var hasError = errorObjects.length > 0;
+										var status = hasError ? "success" : "warning";
+										var title = "Friends removed"
+										var body = '';
+										var timer = hasError ? 5000 : 60000;
 
-									DoGetRequest({
-										url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname=" + inputValue + "&full=false",
-										error: function (err) {
-											logRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, err);
+										if (hasError) {
+											var errorString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ((i === errorObjects.length - 2) ? ' and ' : ', ') }, '').slice(0, -2);
+											body = "<p>" + errorString + " could not be removed due to an error. Please try again or remove them manually.</p>";
+										} else {
+											body = "<p>All friends have been removed.</p>";
+										}
 
-											swal(
-												getTimedSwalArgs(
-													"error",
-													err.status + " - " + err.statusText,
-													"Something went wrong while trying to check whether <strong>" + inputValue + "</strong> exists or not."
-												)
-											);
-										},
-										success: function (data) {
-											logRequest("Successfully fetched the account details of " + inputValue + " in #nt-qa_click.", this, data);
+										body += "<p>To view the changes to your friends list, please refresh the page.</p>";
 
-											if (data.Status == true) {
-												if (data.Relation == "Friend") {
-													swal(
-														getTimedSwalArgs(
-															"success",
-															"Already added",
-															"<strong>" + inputValue + "</strong> is already your friend."
-														)
-													);
-												} else {
-													if (data.AllowAddFriend == true) {
-														if (checkBlocked) {
-															RetrieveBlockedList(data);
-														} else {
-															AddFriend(data);
-														}
-													} else {
-														if (data.AllowAcceptFriend == true) {
-															AcceptFriend(data);
-														} else {
-															swal(
-																getTimedSwalArgs(
-																	"error",
-																	"Can't send request",
-																	"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
-																)
-															);
-														}
-													}
-												}
+										swal(GetTimedSwalArgs(status, title, body, timer));
+									});
+								} else if (json.status == true && json.rockstarAccountList.total == 0) {
+									swal(
+										GetTimedSwalArgs(
+											"success",
+											"No friends",
+											"There were no friends to remove."
+										)
+									);
+								} else {
+									swal(
+										GetTimedSwalArgs(
+											"error",
+											"Something went wrong",
+											"Something went wrong while trying to fetch friend data."
+										)
+									);
+								}
+							},
+							error: function (error) {
+								LogRequest("Couldn't fetch the friends list in #nt-daf_click.", this, error);
+
+								swal(
+									GetTimedSwalArgs(
+										"error",
+										error.status + " - " + error.statusText,
+										"Something went wrong while trying to fetch the total amount of friends."
+									)
+								);
+							}
+						});
+					}
+
+					function RemoveFriendRequestsAction() {
+						var pageIndex = 0;
+						var pageSize = 12;
+
+						DoRequest({
+							url: `${siteMaster.scApiBase}/friends/getInvites?onlineService=sc&nickname=&pageIndex=${pageIndex}&pageSize=${pageSize}`,
+							method: 'GET',
+							success: function (json) {
+								LogRequest("Successfully fetched the friend requests in #nt-raf_click.", this, json);
+
+								if (json.status == true && json.rockstarAccountList.total > 0) {
+									$('.nt-swal-progress-current').text(json.rockstarAccountList.total);
+									$('.nt-swal-progress-total').text(json.rockstarAccountList.total);
+									$('.nt-swal-retrieving').show();
+
+									RetrieveRockstarAccounts(`${siteMaster.scApiBase}/friends/getInvites`, `${siteMaster.scApiBase}/friends/cancelInvite`, function (errorObjects) {
+										var hasError = errorObjects.length > 0;
+										var status = hasError ? "success" : "warning";
+										var title = "Friend requests cancelled"
+										var body = '';
+										var timer = hasError ? 5000 : 60000;
+
+										if (hasError) {
+											var errorString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ((i === errorObjects.length - 2) ? ' and ' : ', ') }, '').slice(0, -2);
+											body = "<p>" + errorString + " could not be cancelled due to an error. Please try again or remove them manually.</p>";
+										} else {
+											body = "<p>All friend requests have been cancelled.</p>";
+										}
+
+										body += "<p>To view the changes to your friend requests, please refresh the page.</p>";
+
+										swal(GetTimedSwalArgs(status, title, body, timer));
+									});
+								} else if (json.status == true && json.rockstarAccountList.total == 0) {
+									swal(
+										GetTimedSwalArgs(
+											"success",
+											"No friend requests",
+											"There were no friend requests to cancel."
+										)
+									);
+								} else {
+									swal(
+										GetTimedSwalArgs(
+											"error",
+											"Something went wrong",
+											"Something went wrong while trying to fetch friend data."
+										)
+									);
+								}
+							},
+							error: function (error) {
+								LogRequest("Couldn't fetch the friend requests in #nt-raf_click.", this, error);
+
+								swal(
+									GetTimedSwalArgs(
+										"error",
+										error.status + " - " + error.statusText,
+										"Something went wrong while trying to fetch the total amount of friend requests."
+									)
+								);
+							}
+						});
+					}
+
+					function QuickAddAction(inputValue) {
+						if (inputValue === false) return false;
+						inputValue = inputValue.trim();
+
+						if (inputValue === "") {
+							swal.showInputError("The username field can't be empty.");
+							return false
+						}
+
+						if (inputValue.match(new RegExp("([^A-Za-z0-9-_\.])"))) {
+							swal.showInputError("The username field contains invalid characters.");
+							return false
+						}
+
+						if (inputValue.length < 6) {
+							swal.showInputError("The username field can't be shorter than 6 characters.");
+							return false
+						}
+
+						if (inputValue.length > 16) {
+							swal.showInputError("The username field can't be longer than 16 characters.");
+							return false
+						}
+
+						if (inputValue.toLowerCase() === userNickname.toLowerCase()) {
+							swal.showInputError("You can't add yourself as a friend.");
+							return false
+						}
+
+						DoLegacyGetRequest({
+							url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname=" + inputValue + "&full=false",
+							error: function (err) {
+								LogRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, err);
+
+								swal(
+									GetTimedSwalArgs(
+										"error",
+										err.status + " - " + err.statusText,
+										"Something went wrong while trying to check whether <strong>" + inputValue + "</strong> exists or not."
+									)
+								);
+							},
+							success: function (data) {
+								LogRequest("Successfully fetched the account details of " + inputValue + " in #nt-qa_click.", this, data);
+
+								if (data.Status == true) {
+									if (data.Relation == "Friend") {
+										swal(
+											GetTimedSwalArgs(
+												"success",
+												"Already added",
+												"<strong>" + inputValue + "</strong> is already your friend."
+											)
+										);
+									} else {
+										if (data.AllowAddFriend == true) {
+											if (checkBlocked) {
+												RetrieveBlockedList(data);
+											} else {
+												AddFriend(data);
+											}
+										} else {
+											if (data.AllowAcceptFriend == true) {
+												AcceptFriend(data);
 											} else {
 												swal(
-													getTimedSwalArgs(
+													GetTimedSwalArgs(
 														"error",
-														"User not found",
-														"The nickname <strong>" + inputValue + "</strong> doesn't exist."
+														"Can't send request",
+														"You can't send <strong>" + inputValue + "</strong> a friend request. This might be because you already sent them a friend request, or because they blocked you."
 													)
 												);
 											}
 										}
-									});
-								});
-						} catch (err) {
-							logError("Something went wrong in #nt-qa_click.", err);
-							return false;
-						}
-
-						return false;
-					});
+									}
+								} else {
+									swal(
+										GetTimedSwalArgs(
+											"error",
+											"User not found",
+											"The nickname <strong>" + inputValue + "</strong> doesn't exist."
+										)
+									);
+								}
+							}
+						});
+					}
 
 					// Utility functions.
 					function RetrieveAllMessageUsers(source, pageIndex) {
@@ -520,13 +600,13 @@ function Init(friendMessage, checkBlocked) {
 							if (pageIndex === undefined) pageIndex = 0;
 
 							setTimeout(function () {
-								DoGetRequest({
+								DoLegacyGetRequest({
 									url: APP_LINK_SC + "/Message/GetConversationList?pageIndex=" + pageIndex,
 									error: function (err) {
-										logRequest("Couldn't fetch the conversation list in RetrieveAllMessageUsers().", this, err);
+										LogRequest("Couldn't fetch the conversation list in RetrieveAllMessageUsers().", this, err);
 
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"error",
 												err.status + " - " + err.statusText,
 												"Something went wrong while trying to fetch the conversation list."
@@ -534,7 +614,7 @@ function Init(friendMessage, checkBlocked) {
 										);
 									},
 									success: function (data) {
-										logRequest("Successfully fetched the conversation list in RetrieveAllMessageUsers().", this, data);
+										LogRequest("Successfully fetched the conversation list in RetrieveAllMessageUsers().", this, data);
 
 										data.Users.forEach(function (e) {
 											source.push(e);
@@ -543,14 +623,14 @@ function Init(friendMessage, checkBlocked) {
 										if (data.HasMore === true) {
 											RetrieveAllMessageUsers(source, data.NextPageIndex);
 										} else {
-											$('#nt-dam-retrieving-text').text("messages");
+											$('.nt-swal-retrieving-text').text("messages");
 											RetrieveAllMessages(source);
 										}
 									}
 								});
 							}, 1000)
 						} catch (err) {
-							logError("Something went wrong in RetrieveAllMessageUsers().", err);
+							LogError("Something went wrong in RetrieveAllMessageUsers().", err);
 							return;
 						}
 					}
@@ -566,38 +646,38 @@ function Init(friendMessage, checkBlocked) {
 									return;
 								}
 
-								logInfo("Popped the items list in RetrieveAllMessages().", item);
+								LogInfo("Popped the items list in RetrieveAllMessages().", item);
 
-								DoGetRequest({
+								DoLegacyGetRequest({
 									url: APP_LINK_SC + "/Message/GetMessages?rockstarId=" + item.RockstarId,
 									error: function (err) {
-										logRequest("Couldn't fetch the messages list in RetrieveAllMessages().", this, err);
+										LogRequest("Couldn't fetch the messages list in RetrieveAllMessages().", this, err);
 
 										if (source.length > 0) {
 											RetrieveAllMessages(source, target);
 										} else if (target.length > 0) {
-											$('#nt-dam-retrieving').hide();
-											$('#nt-dam-progress').show();
+											$('.nt-swal-retrieving').hide();
+											$('.nt-swal-progress').show();
 											RemoveMessages(target);
 										}
 									},
 									success: function (data) {
-										logRequest("Successfully fetched the messages list in RetrieveAllMessages().", this, data);
+										LogRequest("Successfully fetched the messages list in RetrieveAllMessages().", this, data);
 
 										target = target.concat(data.Messages);
 
 										if (source.length > 0) {
 											RetrieveAllMessages(source, target);
 										} else if (target.length > 0) {
-											$('#nt-dam-retrieving').hide();
-											$('#nt-dam-progress').show();
+											$('.nt-swal-retrieving').hide();
+											$('.nt-swal-progress').show();
 											RemoveMessages(target);
 										}
 									}
 								});
 							}, 1000)
 						} catch (err) {
-							logError("Something went wrong in RetrieveAllMessages().", err);
+							LogError("Something went wrong in RetrieveAllMessages().", err);
 							return;
 						}
 					}
@@ -608,7 +688,7 @@ function Init(friendMessage, checkBlocked) {
 
 							setTimeout(function () {
 								var CompleteFunction = function () {
-									$('#nt-dam-progress-current').text(source.length);
+									$('.nt-swal-progress-current').text(source.length);
 
 									if (source.length > 0) {
 										RemoveMessages(source, hasError);
@@ -619,7 +699,7 @@ function Init(friendMessage, checkBlocked) {
 									var timer = !hasError ? 5000 : 60000;
 
 									swal(
-										getTimedSwalArgs(
+										GetTimedSwalArgs(
 											status,
 											"Messages removed",
 											(hasError ? "<p>One or more messages could not be deleted due to an error. Please try again or remove them manually.</p>" : "<p>All messages in your inbox have been deleted.</p>") + "<p>To view the changes to your inbox, please refresh the page.</p>",
@@ -630,14 +710,14 @@ function Init(friendMessage, checkBlocked) {
 
 								var item = source.pop();
 								if (item === undefined) {
-									logError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+									LogError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
 									CompleteFunction();
 									return;
 								}
 
-								logInfo("Popped the items list in RemoveMessages().", item);
+								LogInfo("Popped the items list in RemoveMessages().", item);
 
-								DoDataRequest({
+								DoLegacyDataRequest({
 									url: APP_LINK_SC + "/Message/DeleteMessage",
 									type: "POST",
 									data: {
@@ -645,12 +725,12 @@ function Init(friendMessage, checkBlocked) {
 										"isAdmin": item.IsAdminMessage
 									},
 									error: function (err) {
-										logRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
+										LogRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
 
 										hasError = true;
 									},
 									success: function (data) {
-										logRequest("Successfully completed deleted message " + item.ID + " in RemoveMessages().", this, data);
+										LogRequest("Successfully completed deleted message " + item.ID + " in RemoveMessages().", this, data);
 
 										if (data.Status != true) {
 											hasError = true;
@@ -660,145 +740,109 @@ function Init(friendMessage, checkBlocked) {
 								});
 							}, 1000)
 						} catch (err) {
-							logError("Something went wrong in RemoveMessages().", err);
+							LogError("Something went wrong in RemoveMessages().", err);
 							return;
 						}
 					}
 
-					function RetrieveAllFriends(source, pageIndex) {
+					function RetrieveRockstarAccounts(retrieveUrl, actionUrl, actionCallback, source, pageIndex, pageSize) {
 						try {
+							if (source === undefined) source = [];
 							if (pageIndex === undefined) pageIndex = 0;
+							if (pageSize === undefined) pageSize = 12;
 
-							setTimeout(function () {
-								DoGetRequest({
-									url: APP_LINK_SC + "/friends/GetFriendsAndInvitesSentJson?pageNumber=" + pageIndex + "&onlineService=sc&pendingInvitesOnly=false",
-									error: function (err) {
-										logRequest("Couldn't fetch the friends and invites sent list in RetrieveAllFriends().", this, err);
+							DoRequest({
+								url: `${retrieveUrl}?onlineService=sc&nickname=&pageIndex=${pageIndex}&pageSize=${pageSize}`,
+								method: 'GET',
+								success: function (json) {
+									LogRequest("Successfully fetched the friends list in RetrieveRockstarAccounts().", this, json);
 
+									if (json.status == true) {
+										json.rockstarAccountList.rockstarAccounts.forEach(function (account) {
+											if (account !== undefined) source.push(account);
+										});
+									} else {
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"error",
-												err.status + " - " + err.statusText,
+												"Something went wrong",
 												"Something went wrong while trying to fetch data from page " + pageIndex + "."
 											)
 										);
-									},
-									success: function (data) {
-										logRequest("Successfully fetched the friends and invites sent list in RetrieveAllFriends().", this, data);
-
-										if (data.Status == true) {
-											data.RockstarAccounts.forEach(function (e) {
-												if (e !== undefined) source.push(e);
-											});
-										} else {
-											swal(
-												getTimedSwalArgs(
-													"error",
-													"Something went wrong",
-													"Something went wrong while trying to fetch data from page " + pageIndex + "."
-												)
-											);
-										}
-
-										if (source.length < data.TotalCount) {
-											RetrieveAllFriends(source, (pageIndex + 1));
-										} else {
-											$('#nt-daf-retrieving').hide();
-											$('#nt-daf-progress').show();
-											RemoveFriends(source);
-										}
 									}
-								});
-							}, 1000)
+
+									if (source.length < json.rockstarAccountList.total) {
+										RetrieveRockstarAccounts(url, source, (pageIndex + 1), pageSize);
+									} else {
+										$('.nt-swal-retrieving').hide();
+										$('.nt-swal-progress').show();
+										ProcessRockstarAccounts(actionUrl, actionCallback, source);
+									}
+								},
+								error: function (error) {
+									LogRequest("Couldn't fetch the friends list in RetrieveRockstarAccounts().", this, error);
+
+									swal(
+										GetTimedSwalArgs(
+											"error",
+											error.status + " - " + error.statusText,
+											"Something went wrong while trying to fetch data from page " + pageIndex + "."
+										)
+									);
+								}
+							});
 						} catch (err) {
-							logError("Something went wrong in RetrieveAllFriends().", err);
+							LogError("Something went wrong in RetrieveRockstarAccounts().", err);
 							return;
 						}
 					}
 
-					function RemoveFriends(source, isFriendRequestLoop, errorObjects) {
+					function ProcessRockstarAccounts(actionUrl, actionCallback, source, errorObjects) {
 						try {
-							if (isFriendRequestLoop === undefined) isFriendRequestLoop = false;
 							if (errorObjects === undefined) errorObjects = [];
 
 							setTimeout(function () {
-								var operation = undefined;
 								var CompleteFunction = function () {
-									$('#nt-daf-progress-current, #nt-raf-progress-current').text(source.length);
+									$('.nt-swal-progress-current').text(source.length);
 
 									if (source.length > 0) {
-										RemoveFriends(source, isFriendRequestLoop, errorObjects);
+										ProcessRockstarAccounts(actionUrl, actionCallback, source, errorObjects);
 										return;
 									}
 
-									var status = errorObjects.length === 0 ? "success" : "warning";
-									var timer = errorObjects.length === 0 ? 5000 : 60000;
-									var errorObjectsString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ((i === errorObjects.length - 2) ? ' and ' : ', ') }, '').slice(0, -2);
-
-									if (isFriendRequestLoop) {
-										swal(
-											getTimedSwalArgs(
-												status,
-												"Friend requests rejected",
-												(errorObjects.length !== 0 ? "<p>" + errorObjectsString + " could not be rejected due to an error. Please try again or remove them manually.</p>" : "<p>All friend requests you received have been rejected.</p>") + "<p>To view the changes to your friends list, please refresh the page.</p>",
-												timer
-											)
-										);
-									} else {
-										swal(
-											getTimedSwalArgs(
-												status,
-												"Friends removed",
-												(errorObjects.length !== 0 ? "<p>" + errorObjectsString + " could not be deleted due to an error. Please try again or remove them manually.</p>" : "<p>All friends have been deleted.</p>") + "<p>To view the changes to your friends list, please refresh the page.</p>",
-												timer
-											)
-										);
-									}
+									actionCallback(errorObjects);
 								}
 
 								var item = source.pop();
 								if (item === undefined) {
-									logError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+									LogError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
 									CompleteFunction();
 									return;
 								}
 
-								logInfo("Popped the items list in RemoveFriends().", item);
+								LogInfo("Popped the items list in ProcessRockstarAccounts().", item);
 
-								if (item.Relationship === "InvitedByThem") {
-									operation = "ignore";
-								} else {
-									logError("An item has been skipped.", "No operation is possible for " + item.Name + ".");
+								DoRequest({
+									url: `${actionUrl}?rockstarId=${item.rockstarId}`,
+									method: 'POST',
+									success: function (json) {
+										LogRequest("Successfully processed the popped item in ProcessRockstarAccounts().", this, json);
 
-									errorObjects.push(item.Name);
-									CompleteFunction();
-									return;
-								}
+										if (json.status != true) errorObjects.push(item.name);
 
-								DoDataRequest({
-									url: APP_LINK_SC + "/friends/UpdateFriend",
-									type: "PUT",
-									data: {
-										"id": item.RockstarId,
-										"op": operation
+										CompleteFunction();
 									},
-									error: function (err) {
-										logRequest("Couldn't complete " + operation + " " + item.Name + " in RemoveFriends().", this, err);
+									error: function (error) {
+										LogRequest("Couldn't process the popped item in ProcessRockstarAccounts().", this, error);
 
-										errorObjects.push(item.Name);
-									},
-									success: function (data) {
-										logRequest("Successfully completed " + operation + " " + item.Name + " in RemoveFriends().", this, data);
+										errorObjects.push(item.name);
 
-										if (data.Status != true) {
-											errorObjects.push(item.Name);
-										}
-									},
-									complete: CompleteFunction
+										CompleteFunction();
+									}
 								});
 							}, 1000)
 						} catch (err) {
-							logError("Something went wrong in RemoveFriends().", err);
+							LogError("Something went wrong in ProcessRockstarAccounts().", err);
 							return;
 						}
 					}
@@ -808,13 +852,13 @@ function Init(friendMessage, checkBlocked) {
 							var target = [];
 
 							setTimeout(function () {
-								DoGetRequest({
+								DoLegacyGetRequest({
 									url: APP_LINK_SC + "/friends/GetBlockedJson",
 									error: function (err) {
-										logRequest("Couldn't fetch blocked users list in RetrieveBlockedList().", this, err);
+										LogRequest("Couldn't fetch blocked users list in RetrieveBlockedList().", this, err);
 
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"error",
 												err.status + " - " + err.statusText,
 												"Something went wrong while trying to retrieve blocked users."
@@ -822,7 +866,7 @@ function Init(friendMessage, checkBlocked) {
 										);
 									},
 									success: function (data) {
-										logRequest("Successfully fetched blocked users list in RetrieveBlockedList().", this, data);
+										LogRequest("Successfully fetched blocked users list in RetrieveBlockedList().", this, data);
 
 										if (data.Status == true) {
 											data.RockstarAccounts.forEach(function (e) {
@@ -837,7 +881,7 @@ function Init(friendMessage, checkBlocked) {
 												AddFriend(source);
 											} else {
 												swal(
-													getTimedSwalArgs(
+													GetTimedSwalArgs(
 														"error",
 														"User blocked",
 														"<strong>" + source.Nickname + "</strong> is on your blocked users list. To be able to send them a friend request, remove them from your blocked users list, then try again."
@@ -846,7 +890,7 @@ function Init(friendMessage, checkBlocked) {
 											}
 										} else {
 											swal(
-												getTimedSwalArgs(
+												GetTimedSwalArgs(
 													"error",
 													"Something went wrong",
 													"Something went wrong while trying to retrieve blocked users."
@@ -857,14 +901,14 @@ function Init(friendMessage, checkBlocked) {
 								});
 							}, 1000)
 						} catch (err) {
-							logError("Something went wrong in RetrieveBlockedList().", err);
+							LogError("Something went wrong in RetrieveBlockedList().", err);
 							return;
 						}
 					}
 
 					function AddFriend(source) {
 						try {
-							DoDataRequest({
+							DoLegacyDataRequest({
 								url: APP_LINK_SC + "/friends/UpdateFriend",
 								type: "PUT",
 								data: {
@@ -873,10 +917,10 @@ function Init(friendMessage, checkBlocked) {
 									"custommessage": friendMessage
 								},
 								error: function (err) {
-									logRequest("Couldn't complete add " + source.Nickname + " in AddFriend().", this, err);
+									LogRequest("Couldn't complete add " + source.Nickname + " in AddFriend().", this, err);
 
 									swal(
-										getTimedSwalArgs(
+										GetTimedSwalArgs(
 											"error",
 											err.status + " - " + err.statusText,
 											"Something went wrong trying to add <strong>" + source.Nickname + "</strong>."
@@ -884,11 +928,11 @@ function Init(friendMessage, checkBlocked) {
 									);
 								},
 								success: function (data) {
-									logRequest("Successfully completed add " + source.Nickname + " in AddFriend().", this, data);
+									LogRequest("Successfully completed add " + source.Nickname + " in AddFriend().", this, data);
 
 									if (data.Status == true) {
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"success",
 												"User added",
 												"<p>A friend request has been sent to <strong>" + source.Nickname + "</strong>.</p><p>To view the changes to your friends list, please refresh the page.</p>",
@@ -896,7 +940,7 @@ function Init(friendMessage, checkBlocked) {
 										);
 									} else {
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"error",
 												"Something went wrong",
 												"Something went wrong trying to add <strong>" + source.Nickname + "</strong>."
@@ -906,14 +950,14 @@ function Init(friendMessage, checkBlocked) {
 								}
 							});
 						} catch (err) {
-							logError("Something went wrong in AddFriend().", err);
+							LogError("Something went wrong in AddFriend().", err);
 							return;
 						}
 					}
 
 					function AcceptFriend(source) {
 						try {
-							DoDataRequest({
+							DoLegacyDataRequest({
 								url: APP_LINK_SC + "/friends/UpdateFriend",
 								type: "PUT",
 								data: {
@@ -922,10 +966,10 @@ function Init(friendMessage, checkBlocked) {
 									"accept": "true"
 								},
 								error: function (err) {
-									logRequest("Couldn't complete accept " + source.Nickname + "'s friend request in AcceptFriend().", this, err);
+									LogRequest("Couldn't complete accept " + source.Nickname + "'s friend request in AcceptFriend().", this, err);
 
 									swal(
-										getTimedSwalArgs(
+										GetTimedSwalArgs(
 											"error",
 											err.status + " - " + err.statusText,
 											"Something went wrong trying to accept <strong>" + source.Nickname + "</strong>'s friend request."
@@ -933,11 +977,11 @@ function Init(friendMessage, checkBlocked) {
 									);
 								},
 								success: function (data) {
-									logRequest("Successfully completed accept " + source.Nickname + "'s friend request in AcceptFriend().", this, data);
+									LogRequest("Successfully completed accept " + source.Nickname + "'s friend request in AcceptFriend().", this, data);
 
 									if (data.Status == true) {
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"success",
 												"User accepted",
 												"<p><strong>" + source.Nickname + "</strong> already sent you a friend request, and we accepted it instead of sending a new one.</p><p>To view the changes to your friends list, please refresh the page.</p>",
@@ -945,7 +989,7 @@ function Init(friendMessage, checkBlocked) {
 										);
 									} else {
 										swal(
-											getTimedSwalArgs(
+											GetTimedSwalArgs(
 												"error",
 												"Something went wrong",
 												"Something went wrong trying to accept <strong>" + source.Nickname + "</strong>'s friend request."
@@ -955,15 +999,15 @@ function Init(friendMessage, checkBlocked) {
 								}
 							});
 						} catch (err) {
-							logError("Something went wrong in AcceptFriend().", err);
+							LogError("Something went wrong in AcceptFriend().", err);
 							return;
 						}
 					}
 				} else {
-					logError("In order to use " + APP_NAME + ", you must log into your Social Club account.", "userNickname == \"\" || isLoggedIn != true");
+					LogError("In order to use " + APP_NAME + ", you must log into your Social Club account.", "userNickname == \"\" || isLoggedIn != true");
 
 					swal(
-						getPersistentSwalArgs(
+						GetPersistentSwalArgs(
 							"error",
 							"Log in required",
 							APP_NAME + " requires you to log in to be able to apply changes to your account. Please log into the account you want to use with " + APP_NAME + ", then click the bookmark again."
@@ -971,10 +1015,10 @@ function Init(friendMessage, checkBlocked) {
 					);
 				}
 			} catch (err) {
-				logError("Something went wrong.", err);
+				LogError("Something went wrong.", err);
 
 				swal(
-					getPersistentSwalArgs(
+					GetPersistentSwalArgs(
 						"error",
 						"An error occured",
 						"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
@@ -984,7 +1028,7 @@ function Init(friendMessage, checkBlocked) {
 				return;
 			}
 		} else {
-			logError("The current website is not a Social Club website and " + APP_NAME + " can't continue.", "window.location.protocol !== \"https:\" || !window.location.host.endsWith(\"socialclub.rockstargames.com\")");
+			LogError("The current website is not a Social Club website and " + APP_NAME + " can't continue.", "window.location.protocol !== \"https:\" || !window.location.host.endsWith(\"socialclub.rockstargames.com\")");
 
 			swal(
 				{
