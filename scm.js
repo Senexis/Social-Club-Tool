@@ -747,6 +747,10 @@ function Init(friendMessage, checkBlocked) {
 
 					function RetrieveRockstarAccounts(retrieveUrl, actionUrl, actionCallback, source, pageIndex, pageSize) {
 						try {
+							if (retrieveUrl === undefined) throw new Error('No retrieve URL supplied.');
+							if (actionUrl === undefined) throw new Error('No action URL supplied.');
+							if (actionCallback === undefined) throw new Error('No action callback supplied.');
+
 							if (source === undefined) source = [];
 							if (pageIndex === undefined) pageIndex = 0;
 							if (pageSize === undefined) pageSize = 12;
@@ -799,6 +803,10 @@ function Init(friendMessage, checkBlocked) {
 
 					function ProcessRockstarAccounts(actionUrl, actionCallback, source, errorObjects) {
 						try {
+							if (actionUrl === undefined) throw new Error('No action URL supplied.');
+							if (actionCallback === undefined) throw new Error('No action callback supplied.');
+							if (source === undefined) throw new Error('No rockstar accounts source supplied.');
+
 							if (errorObjects === undefined) errorObjects = [];
 
 							setTimeout(function () {
