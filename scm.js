@@ -403,8 +403,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										var timer = hasError ? 5000 : 60000;
 
 										if (hasError) {
-											var errorString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ((i === errorObjects.length - 2) ? ' and ' : ', ') }, '').slice(0, -2);
-											body = "<p>" + errorString + " could not be removed due to an error. Please try again or remove them manually.</p>";
+											body = "<p>" + errorObjects.length + " friend(s) could not be removed due to an error. Please try again or remove them manually.</p>";
 										} else {
 											body = "<p>All friends have been removed.</p>";
 										}
@@ -468,8 +467,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										var timer = hasError ? 5000 : 60000;
 
 										if (hasError) {
-											var errorString = errorObjects.reduce(function (prev, curr, i) { return prev + curr + ((i === errorObjects.length - 2) ? ' and ' : ', ') }, '').slice(0, -2);
-											body = "<p>" + errorString + " could not be cancelled due to an error. Please try again or remove them manually.</p>";
+											body = "<p>" + errorObjects.length + " friend request(s) could not be cancelled due to an error. Please try again or remove them manually.</p>";
 										} else {
 											body = "<p>All friend requests have been cancelled.</p>";
 										}
