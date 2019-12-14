@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = 27;
+	const APP_VERSION = 28;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
