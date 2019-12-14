@@ -7,6 +7,7 @@ function Init(friendMessage, checkBlocked, debug) {
 	const APP_LINK_ISSUES = "https://github.com/Senexis/Social-Club-Tool/issues/new";
 	const APP_LINK_SC = "https://" + window.location.host;
 	const APP_CLIENT_VERSION = localStorage.getItem('SCUT_CLIENT_VERSION');
+	const APP_REQUEST_DELAY = 1000;
 
 	try {
 		console.log.apply(console, ["%c " + APP_NAME + " %cv" + APP_VERSION + " by " + APP_AUTHOR + " %c " + APP_LINK, "background:#000000;color:#f90", "background:#000000;color:#ffffff", ""]);
@@ -631,7 +632,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										}
 									}
 								});
-							}, 1000)
+							}, APP_REQUEST_DELAY)
 						} catch (err) {
 							LogError("Something went wrong in RetrieveAllMessageUsers().", err);
 							return;
@@ -678,7 +679,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										}
 									}
 								});
-							}, 1000)
+							}, APP_REQUEST_DELAY)
 						} catch (err) {
 							LogError("Something went wrong in RetrieveAllMessages().", err);
 							return;
@@ -689,10 +690,10 @@ function Init(friendMessage, checkBlocked, debug) {
 						try {
 							if (hasError === undefined) hasError = false;
 
-							setTimeout(function () {
-								var CompleteFunction = function () {
-									$('.nt-swal-progress-current').text(source.length);
+							var CompleteFunction = function () {
+								$('.nt-swal-progress-current').text(source.length);
 
+								setTimeout(function () {
 									if (source.length > 0) {
 										RemoveMessages(source, hasError);
 										return;
@@ -709,39 +710,39 @@ function Init(friendMessage, checkBlocked, debug) {
 											timer
 										)
 									);
-								}
+								}, APP_REQUEST_DELAY);
+							}
 
-								var item = source.pop();
-								if (item === undefined) {
-									LogError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
-									CompleteFunction();
-									return;
-								}
+							var item = source.pop();
+							if (item === undefined) {
+								LogError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+								CompleteFunction();
+								return;
+							}
 
-								LogInfo("Popped the items list in RemoveMessages().", item);
+							LogInfo("Popped the items list in RemoveMessages().", item);
 
-								DoLegacyDataRequest({
-									url: APP_LINK_SC + "/Message/DeleteMessage",
-									type: "POST",
-									data: {
-										"messageid": item.ID,
-										"isAdmin": item.IsAdminMessage
-									},
-									error: function (err) {
-										LogRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
+							DoLegacyDataRequest({
+								url: APP_LINK_SC + "/Message/DeleteMessage",
+								type: "POST",
+								data: {
+									"messageid": item.ID,
+									"isAdmin": item.IsAdminMessage
+								},
+								error: function (err) {
+									LogRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
 
+									hasError = true;
+								},
+								success: function (data) {
+									LogRequest("Successfully completed deleted message " + item.ID + " in RemoveMessages().", this, data);
+
+									if (data.Status != true) {
 										hasError = true;
-									},
-									success: function (data) {
-										LogRequest("Successfully completed deleted message " + item.ID + " in RemoveMessages().", this, data);
-
-										if (data.Status != true) {
-											hasError = true;
-										}
-									},
-									complete: CompleteFunction
-								});
-							}, 1000)
+									}
+								},
+								complete: CompleteFunction
+							});
 						} catch (err) {
 							LogError("Something went wrong in RemoveMessages().", err);
 							return;
@@ -778,13 +779,15 @@ function Init(friendMessage, checkBlocked, debug) {
 										);
 									}
 
-									if (source.length < json.rockstarAccountList.total) {
-										RetrieveRockstarAccounts(retrieveUrl, actionUrl, actionCallback, source, (pageIndex + 1), pageSize);
-									} else {
-										$('.nt-swal-retrieving').hide();
-										$('.nt-swal-progress').show();
-										ProcessRockstarAccounts(actionUrl, actionCallback, source);
-									}
+									setTimeout(function () {
+										if (source.length < json.rockstarAccountList.total) {
+											RetrieveRockstarAccounts(retrieveUrl, actionUrl, actionCallback, source, (pageIndex + 1), pageSize);
+										} else {
+											$('.nt-swal-retrieving').hide();
+											$('.nt-swal-progress').show();
+											ProcessRockstarAccounts(actionUrl, actionCallback, source);
+										}
+									}, APP_REQUEST_DELAY);
 								},
 								error: function (error) {
 									LogRequest("Couldn't fetch the friends list in RetrieveRockstarAccounts().", this, error);
@@ -812,50 +815,50 @@ function Init(friendMessage, checkBlocked, debug) {
 
 							if (errorObjects === undefined) errorObjects = [];
 
-							setTimeout(function () {
-								var CompleteFunction = function () {
-									$('.nt-swal-progress-current').text(source.length);
+							var CompleteFunction = function () {
+								$('.nt-swal-progress-current').text(source.length);
 
+								setTimeout(function () {
 									if (source.length > 0) {
 										ProcessRockstarAccounts(actionUrl, actionCallback, source, errorObjects);
 										return;
 									}
 
 									actionCallback(errorObjects);
-								}
+								}, APP_REQUEST_DELAY);
+							}
 
-								var item = source.pop();
-								if (item === undefined) {
-									LogError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+							var item = source.pop();
+							if (item === undefined) {
+								LogError("An item has been skipped.", "The current item is undefined, also I'm a teapot.");
+								CompleteFunction();
+								return;
+							}
+
+							LogInfo("Popped the items list in ProcessRockstarAccounts().", item);
+
+							if (debug === 1) {
+								item.rockstarId = 'x';
+							}
+
+							DoRequest({
+								url: `${actionUrl}?rockstarId=${item.rockstarId}`,
+								method: 'POST',
+								success: function (json) {
+									LogRequest("Successfully processed the popped item in ProcessRockstarAccounts().", this, json);
+
+									if (json.status != true) errorObjects.push(item.name);
+
 									CompleteFunction();
-									return;
+								},
+								error: function (error) {
+									LogRequest("Couldn't process the popped item in ProcessRockstarAccounts().", this, error);
+
+									errorObjects.push(item.name);
+
+									CompleteFunction();
 								}
-
-								LogInfo("Popped the items list in ProcessRockstarAccounts().", item);
-
-								if (debug === 1) {
-									item.rockstarId = 'x';
-								}
-
-								DoRequest({
-									url: `${actionUrl}?rockstarId=${item.rockstarId}`,
-									method: 'POST',
-									success: function (json) {
-										LogRequest("Successfully processed the popped item in ProcessRockstarAccounts().", this, json);
-
-										if (json.status != true) errorObjects.push(item.name);
-
-										CompleteFunction();
-									},
-									error: function (error) {
-										LogRequest("Couldn't process the popped item in ProcessRockstarAccounts().", this, error);
-
-										errorObjects.push(item.name);
-
-										CompleteFunction();
-									}
-								});
-							}, 1000)
+							});
 						} catch (err) {
 							LogError("Something went wrong in ProcessRockstarAccounts().", err);
 							return;
@@ -914,7 +917,7 @@ function Init(friendMessage, checkBlocked, debug) {
 										}
 									}
 								});
-							}, 1000)
+							}, APP_REQUEST_DELAY)
 						} catch (err) {
 							LogError("Something went wrong in RetrieveBlockedList().", err);
 							return;
@@ -1063,5 +1066,5 @@ function Init(friendMessage, checkBlocked, debug) {
 				}
 			);
 		}
-	}, 1000);
+	}, APP_REQUEST_DELAY);
 }
