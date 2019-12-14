@@ -11,7 +11,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 	try {
 		console.log.apply(console, ["%c " + APP_NAME + " %cv" + APP_VERSION + " by " + APP_AUTHOR + " %c " + APP_LINK, "background:#000000;color:#f90", "background:#000000;color:#ffffff", ""]);
-	} catch (err) {
+	} catch (error) {
 		console.log(APP_NAME + " v" + APP_VERSION + " by " + APP_AUTHOR + " - " + APP_LINK);
 	}
 
@@ -71,6 +71,8 @@ function Init(friendMessage, checkBlocked, debug) {
 	}
 
 	function GetTimedSwalArgs(type, title, body, timer) {
+		if (type === "success") timer = 5000;
+		if (type === "error") timer = 60000;
 		if (timer === undefined) timer = 5000;
 
 		return {
@@ -112,8 +114,8 @@ function Init(friendMessage, checkBlocked, debug) {
 		sajs.id = "nt-sajs";
 		sajs.src = "https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js";
 		document.getElementsByTagName('head')[0].appendChild(sajs);
-	} catch (err) {
-		LogError("Something went wrong while trying to load the necessary scripts.", err);
+	} catch (error) {
+		LogError("Something went wrong while trying to load the necessary scripts.", error);
 		return;
 	}
 
@@ -124,14 +126,14 @@ function Init(friendMessage, checkBlocked, debug) {
 					var verificationToken = $(siteMaster.aft)[0].value;
 					var userNickname = siteMaster.authUserNickName;
 					var isLoggedIn = siteMaster.isLoggedIn;
-				} catch (err) {
-					LogError("Could not fetch all necessary account data because something went wrong.", err);
+				} catch (error) {
+					LogError("Could not fetch all necessary account data because something went wrong.", error);
 
 					swal(
 						GetPersistentSwalArgs(
 							"error",
 							"An error occured",
-							"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to retrieve the required account data. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
+							"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to retrieve the required account data. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + error + "</pre>"
 						)
 					);
 
@@ -183,8 +185,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								}
 							);
-						} catch (err) {
-							LogError("Something went wrong in #nt-dam_click.", err);
+						} catch (error) {
+							LogError("Something went wrong in #nt-dam_click.", error);
 							return false;
 						}
 
@@ -209,8 +211,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								}
 							);
-						} catch (err) {
-							LogError("Something went wrong in #nt-raf_click.", err);
+						} catch (error) {
+							LogError("Something went wrong in #nt-raf_click.", error);
 							return false;
 						}
 
@@ -235,8 +237,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								}
 							);
-						} catch (err) {
-							LogError("Something went wrong in #nt-daf_click.", err);
+						} catch (error) {
+							LogError("Something went wrong in #nt-daf_click.", error);
 							return false;
 						}
 
@@ -260,8 +262,8 @@ function Init(friendMessage, checkBlocked, debug) {
 								showCancelButton: true,
 								showLoaderOnConfirm: true
 							}, (inputValue) => QuickAddAction(inputValue));
-						} catch (err) {
-							LogError("Something went wrong in #nt-qa_click.", err);
+						} catch (error) {
+							LogError("Something went wrong in #nt-qa_click.", error);
 							return false;
 						}
 
@@ -348,13 +350,13 @@ function Init(friendMessage, checkBlocked, debug) {
 					function RemoveMessagesAction() {
 						DoLegacyGetRequest({
 							url: APP_LINK_SC + "/Message/GetMessageCount",
-							error: function (err) {
-								LogRequest("Couldn't fetch the total message count in #nt-dam_click.", this, err);
+							error: function (error) {
+								LogRequest("Couldn't fetch the total message count in #nt-dam_click.", this, error);
 
 								swal(
 									GetTimedSwalArgs(
 										"error",
-										err.status + " - " + err.statusText,
+										"Something went wrong",
 										"Something went wrong while trying to fetch the total amount of messages."
 									)
 								);
@@ -400,7 +402,6 @@ function Init(friendMessage, checkBlocked, debug) {
 										var status = hasError ? "success" : "warning";
 										var title = "Friends removed"
 										var body = '';
-										var timer = hasError ? 5000 : 60000;
 
 										if (hasError) {
 											body = "<p>" + errorObjects.length + " friend(s) could not be removed due to an error. Please try again or remove them manually.</p>";
@@ -410,7 +411,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 										body += "<p>To view the changes to your friends list, please refresh the page.</p>";
 
-										swal(GetTimedSwalArgs(status, title, body, timer));
+										swal(GetTimedSwalArgs(status, title, body));
 									});
 								} else if (json.status == true && json.rockstarAccountList.total == 0) {
 									swal(
@@ -436,7 +437,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								swal(
 									GetTimedSwalArgs(
 										"error",
-										error.status + " - " + error.statusText,
+										"Something went wrong",
 										"Something went wrong while trying to fetch the total amount of friends."
 									)
 								);
@@ -464,7 +465,6 @@ function Init(friendMessage, checkBlocked, debug) {
 										var status = hasError ? "success" : "warning";
 										var title = "Friend requests cancelled"
 										var body = '';
-										var timer = hasError ? 5000 : 60000;
 
 										if (hasError) {
 											body = "<p>" + errorObjects.length + " friend request(s) could not be cancelled due to an error. Please try again or remove them manually.</p>";
@@ -474,7 +474,7 @@ function Init(friendMessage, checkBlocked, debug) {
 
 										body += "<p>To view the changes to your friend requests, please refresh the page.</p>";
 
-										swal(GetTimedSwalArgs(status, title, body, timer));
+										swal(GetTimedSwalArgs(status, title, body));
 									});
 								} else if (json.status == true && json.rockstarAccountList.total == 0) {
 									swal(
@@ -500,7 +500,7 @@ function Init(friendMessage, checkBlocked, debug) {
 								swal(
 									GetTimedSwalArgs(
 										"error",
-										error.status + " - " + error.statusText,
+										"Something went wrong",
 										"Something went wrong while trying to fetch the total amount of friend requests."
 									)
 								);
@@ -539,13 +539,13 @@ function Init(friendMessage, checkBlocked, debug) {
 
 						DoLegacyGetRequest({
 							url: APP_LINK_SC + "/Friends/GetAccountDetails?nickname=" + inputValue + "&full=false",
-							error: function (err) {
-								LogRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, err);
+							error: function (error) {
+								LogRequest("Couldn't fetch the account details of " + inputValue + " in #nt-qa_click.", this, error);
 
 								swal(
 									GetTimedSwalArgs(
 										"error",
-										err.status + " - " + err.statusText,
+										"Something went wrong",
 										"Something went wrong while trying to check whether <strong>" + inputValue + "</strong> exists or not."
 									)
 								);
@@ -604,13 +604,13 @@ function Init(friendMessage, checkBlocked, debug) {
 							setTimeout(function () {
 								DoLegacyGetRequest({
 									url: APP_LINK_SC + "/Message/GetConversationList?pageIndex=" + pageIndex,
-									error: function (err) {
-										LogRequest("Couldn't fetch the conversation list in RetrieveAllMessageUsers().", this, err);
+									error: function (error) {
+										LogRequest("Couldn't fetch the conversation list in RetrieveAllMessageUsers().", this, error);
 
 										swal(
 											GetTimedSwalArgs(
 												"error",
-												err.status + " - " + err.statusText,
+												"Something went wrong",
 												"Something went wrong while trying to fetch the conversation list."
 											)
 										);
@@ -631,8 +631,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								});
 							}, APP_REQUEST_DELAY)
-						} catch (err) {
-							LogError("Something went wrong in RetrieveAllMessageUsers().", err);
+						} catch (error) {
+							LogError("Something went wrong in RetrieveAllMessageUsers().", error);
 							return;
 						}
 					}
@@ -652,8 +652,8 @@ function Init(friendMessage, checkBlocked, debug) {
 
 								DoLegacyGetRequest({
 									url: APP_LINK_SC + "/Message/GetMessages?rockstarId=" + item.RockstarId,
-									error: function (err) {
-										LogRequest("Couldn't fetch the messages list in RetrieveAllMessages().", this, err);
+									error: function (error) {
+										LogRequest("Couldn't fetch the messages list in RetrieveAllMessages().", this, error);
 
 										if (source.length > 0) {
 											RetrieveAllMessages(source, target);
@@ -678,8 +678,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								});
 							}, APP_REQUEST_DELAY)
-						} catch (err) {
-							LogError("Something went wrong in RetrieveAllMessages().", err);
+						} catch (error) {
+							LogError("Something went wrong in RetrieveAllMessages().", error);
 							return;
 						}
 					}
@@ -710,17 +710,19 @@ function Init(friendMessage, checkBlocked, debug) {
 										return;
 									}
 
-									var status = !hasError ? "success" : "warning";
-									var timer = !hasError ? 5000 : 60000;
+									var status = hasError ? "success" : "warning";
+									var title = "Messages removed"
+									var body = '';
 
-									swal(
-										GetTimedSwalArgs(
-											status,
-											"Messages removed",
-											(hasError ? "<p>One or more messages could not be deleted due to an error. Please try again or remove them manually.</p>" : "<p>All messages in your inbox have been deleted.</p>") + "<p>To view the changes to your inbox, please refresh the page.</p>",
-											timer
-										)
-									);
+									if (hasError) {
+										body = "<p>One or more messages could not be deleted due to an error. Please try again or remove them manually.</p>";
+									} else {
+										body = "<p>All messages in your inbox have been deleted.</p>";
+									}
+
+									body += "<p>To view the changes to your inbox, please refresh the page.</p>";
+
+									swal(GetTimedSwalArgs(status, title, body));
 								}, APP_REQUEST_DELAY);
 							}
 
@@ -740,10 +742,10 @@ function Init(friendMessage, checkBlocked, debug) {
 									"messageid": item.ID,
 									"isAdmin": item.IsAdminMessage
 								},
-								error: function (err) {
-									LogRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
+								error: function (error) {
+									LogRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, error);
 
-									if (err.status === 429) {
+									if (error.status === 429) {
 										isRateLimited = true;
 									}
 
@@ -758,8 +760,8 @@ function Init(friendMessage, checkBlocked, debug) {
 								},
 								complete: CompleteFunction
 							});
-						} catch (err) {
-							LogError("Something went wrong in RemoveMessages().", err);
+						} catch (error) {
+							LogError("Something went wrong in RemoveMessages().", error);
 							return;
 						}
 					}
@@ -810,14 +812,14 @@ function Init(friendMessage, checkBlocked, debug) {
 									swal(
 										GetTimedSwalArgs(
 											"error",
-											error.status + " - " + error.statusText,
+											"Something went wrong",
 											"Something went wrong while trying to fetch data from page " + pageIndex + "."
 										)
 									);
 								}
 							});
-						} catch (err) {
-							LogError("Something went wrong in RetrieveRockstarAccounts().", err);
+						} catch (error) {
+							LogError("Something went wrong in RetrieveRockstarAccounts().", error);
 							return;
 						}
 					}
@@ -874,8 +876,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									CompleteFunction();
 								}
 							});
-						} catch (err) {
-							LogError("Something went wrong in ProcessRockstarAccounts().", err);
+						} catch (error) {
+							LogError("Something went wrong in ProcessRockstarAccounts().", error);
 							return;
 						}
 					}
@@ -887,13 +889,13 @@ function Init(friendMessage, checkBlocked, debug) {
 							setTimeout(function () {
 								DoLegacyGetRequest({
 									url: APP_LINK_SC + "/friends/GetBlockedJson",
-									error: function (err) {
-										LogRequest("Couldn't fetch blocked users list in RetrieveBlockedList().", this, err);
+									error: function (error) {
+										LogRequest("Couldn't fetch blocked users list in RetrieveBlockedList().", this, error);
 
 										swal(
 											GetTimedSwalArgs(
 												"error",
-												err.status + " - " + err.statusText,
+												"Something went wrong",
 												"Something went wrong while trying to retrieve blocked users."
 											)
 										);
@@ -933,8 +935,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								});
 							}, APP_REQUEST_DELAY)
-						} catch (err) {
-							LogError("Something went wrong in RetrieveBlockedList().", err);
+						} catch (error) {
+							LogError("Something went wrong in RetrieveBlockedList().", error);
 							return;
 						}
 					}
@@ -949,13 +951,13 @@ function Init(friendMessage, checkBlocked, debug) {
 									"op": "addfriend",
 									"custommessage": friendMessage
 								},
-								error: function (err) {
-									LogRequest("Couldn't complete add " + source.Nickname + " in AddFriend().", this, err);
+								error: function (error) {
+									LogRequest("Couldn't complete add " + source.Nickname + " in AddFriend().", this, error);
 
 									swal(
 										GetTimedSwalArgs(
 											"error",
-											err.status + " - " + err.statusText,
+											"Something went wrong",
 											"Something went wrong trying to add <strong>" + source.Nickname + "</strong>."
 										)
 									);
@@ -982,8 +984,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								}
 							});
-						} catch (err) {
-							LogError("Something went wrong in AddFriend().", err);
+						} catch (error) {
+							LogError("Something went wrong in AddFriend().", error);
 							return;
 						}
 					}
@@ -998,13 +1000,13 @@ function Init(friendMessage, checkBlocked, debug) {
 									"op": "confirm",
 									"accept": "true"
 								},
-								error: function (err) {
-									LogRequest("Couldn't complete accept " + source.Nickname + "'s friend request in AcceptFriend().", this, err);
+								error: function (error) {
+									LogRequest("Couldn't complete accept " + source.Nickname + "'s friend request in AcceptFriend().", this, error);
 
 									swal(
 										GetTimedSwalArgs(
 											"error",
-											err.status + " - " + err.statusText,
+											"Something went wrong",
 											"Something went wrong trying to accept <strong>" + source.Nickname + "</strong>'s friend request."
 										)
 									);
@@ -1031,8 +1033,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									}
 								}
 							});
-						} catch (err) {
-							LogError("Something went wrong in AcceptFriend().", err);
+						} catch (error) {
+							LogError("Something went wrong in AcceptFriend().", error);
 							return;
 						}
 					}
@@ -1047,14 +1049,14 @@ function Init(friendMessage, checkBlocked, debug) {
 						)
 					);
 				}
-			} catch (err) {
-				LogError("Something went wrong.", err);
+			} catch (error) {
+				LogError("Something went wrong.", error);
 
 				swal(
 					GetPersistentSwalArgs(
 						"error",
 						"An error occured",
-						"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + err + "</pre>"
+						"<p style=\"margin:12px 0!important\">" + APP_NAME + " was unable to complete your request. Please try clicking the bookmark again. If the problem persists, please <a href=\"" + APP_LINK_ISSUES + "\" target=\"_blank\">submit an issue</a> with the details below.</p><p style=\"margin:12px 0!important\">Error:</p><pre>" + error + "</pre>"
 					)
 				);
 
