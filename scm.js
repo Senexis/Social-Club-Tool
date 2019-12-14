@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = 28;
+	const APP_VERSION = 29;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -687,8 +687,21 @@ function Init(friendMessage, checkBlocked, debug) {
 					function RemoveMessages(source, hasError) {
 						try {
 							if (hasError === undefined) hasError = false;
+							var isRateLimited = false;
 
 							var CompleteFunction = function () {
+								if (isRateLimited) {
+									swal(
+										GetTimedSwalArgs(
+											"error",
+											"Rate limited",
+											"Rockstar servers blocked a request to prevent spam. Please wait a couple minutes then try again."
+										)
+									);
+
+									return;
+								}
+
 								$('.nt-swal-progress-current').text(source.length);
 
 								setTimeout(function () {
@@ -729,6 +742,10 @@ function Init(friendMessage, checkBlocked, debug) {
 								},
 								error: function (err) {
 									LogRequest("Couldn't complete delete message " + item.ID + " in RemoveMessages().", this, err);
+
+									if (err.status === 429) {
+										isRateLimited = true;
+									}
 
 									hasError = true;
 								},
