@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = 29;
+	const APP_VERSION = 30;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -324,23 +324,71 @@ function Init(friendMessage, checkBlocked, debug) {
 					function DoRequest(object) {
 						try {
 							var bearerToken = GetCookie(siteMaster.scauth.tokenCookieName);
-							var scApiRequestOptions = {
+							var requestInfo = {
 								method: object.method,
-								credentials: 'same-origin',
+								credentials: 'include',
 								cache: 'default',
 								mode: 'cors',
 								headers: {
-									'X-Requested-With': 'XMLHttpRequest',
-									'X-Lang': 'en-US',
-									'X-Cache-Ver': '10',
-									'Authorization': `Bearer ${bearerToken}`
+									'authorization': `Bearer ${bearerToken}`,
+									'x-requested-with': 'XMLHttpRequest'
 								}
 							};
 
-							fetch(object.url, scApiRequestOptions)
-								.then(response => response.json())
+							fetch(object.url, requestInfo)
+								.then(response => {
+									if (!response.ok) {
+										throw response;
+									}
+
+									return response.json();
+								})
 								.then(json => object.success(json))
-								.catch(error => object.error(error))
+								.catch(error => {
+									if (error instanceof Error) {
+										object.error(error);
+									} else if (error instanceof Response) {
+										if (error.status === 401) {
+											DoRefreshRequest(object);
+										} else {
+											object.error(new Error(`Request failed: ${error.status} - ${error.statusText}`));
+										}
+									} else {
+										object.error(new Error('Something went wrong.'));
+									}
+								});
+						} catch (error) {
+							object.error(error);
+						}
+					}
+
+					function DoRefreshRequest(object) {
+						try {
+							if (object.triedRefresh) throw new Error('Could not refresh access.');
+							object.triedRefresh = true;
+
+							var bearerToken = GetCookie(siteMaster.scauth.tokenCookieName);
+							var requestInfo = {
+								method: 'POST',
+								body: `accessToken=${bearerToken}`,
+								credentials: 'include',
+								cache: 'default',
+								mode: 'cors',
+								headers: {
+									'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+									'x-requested-with': 'XMLHttpRequest'
+								}
+							};
+
+							fetch('https://socialclub.rockstargames.com/connect/refreshaccess', requestInfo)
+								.then(response => {
+									if (!response.ok) {
+										throw new Error('Could not refresh access.');
+									}
+
+									DoRequest(object);
+								})
+								.catch(error => object.error(error));
 						} catch (error) {
 							object.error(error);
 						}
