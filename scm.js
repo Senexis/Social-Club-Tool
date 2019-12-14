@@ -1,4 +1,4 @@
-function Init(friendMessage, checkBlocked) {
+function Init(friendMessage, checkBlocked, debug) {
 	const APP_VERSION = 27;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
@@ -18,6 +18,9 @@ function Init(friendMessage, checkBlocked) {
 	friendMessage = friendMessage.replace(/\\\"/g, '').replace(/\"/g, '').replace(/\s\s+/g, ' ').trim();
 
 	if (checkBlocked === undefined) checkBlocked = 1;
+	if (debug === undefined) debug = 0;
+
+	if (debug === 1) alert(APP_NAME + " v" + APP_VERSION + " started in debug mode. If you see this and don't want to, remove the last 1 from Init().");
 
 	// Generic helper functions.
 	function GetCookie(name) {
@@ -829,6 +832,10 @@ function Init(friendMessage, checkBlocked) {
 								}
 
 								LogInfo("Popped the items list in ProcessRockstarAccounts().", item);
+
+								if (debug === 1) {
+									item.rockstarId = 'x';
+								}
 
 								DoRequest({
 									url: `${actionUrl}?rockstarId=${item.rockstarId}`,
