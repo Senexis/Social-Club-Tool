@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked) {
-	const APP_VERSION = 26;
+	const APP_VERSION = 27;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -772,7 +772,7 @@ function Init(friendMessage, checkBlocked) {
 									}
 
 									if (source.length < json.rockstarAccountList.total) {
-										RetrieveRockstarAccounts(url, source, (pageIndex + 1), pageSize);
+										RetrieveRockstarAccounts(retrieveUrl, actionUrl, actionCallback, source, (pageIndex + 1), pageSize);
 									} else {
 										$('.nt-swal-retrieving').hide();
 										$('.nt-swal-progress').show();
