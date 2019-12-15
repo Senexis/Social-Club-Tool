@@ -1,5 +1,5 @@
 function Init(friendMessage, checkBlocked, debug) {
-	const APP_VERSION = 30;
+	const APP_VERSION = 31;
 	const APP_NAME = "Social Club Utility Tool";
 	const APP_NAME_SHORT = "SCUT";
 	const APP_AUTHOR = "Senex";
@@ -350,6 +350,8 @@ function Init(friendMessage, checkBlocked, debug) {
 									} else if (error instanceof Response) {
 										if (error.status === 401) {
 											DoRefreshRequest(object);
+										} else if (error.status === 429) {
+											object.error(new Error('Rate limited.'));
 										} else {
 											object.error(new Error(`Request failed: ${error.status} - ${error.statusText}`));
 										}
@@ -918,6 +920,18 @@ function Init(friendMessage, checkBlocked, debug) {
 								},
 								error: function (error) {
 									LogRequest("Couldn't process the popped item in ProcessRockstarAccounts().", this, error);
+
+									if (error.message.includes('Rate limited.')) {
+										swal(
+											GetTimedSwalArgs(
+												"error",
+												"Rate limited",
+												"Rockstar servers blocked a request to prevent spam. Please wait a couple minutes then try again."
+											)
+										);
+
+										return;
+									}
 
 									errorObjects.push(item.name);
 
