@@ -4,10 +4,12 @@ Now minified thanks to [Javascript Minifier](https://javascript-minifier.com/).
 ## Functionality
 This small tool provides you with some useful additional functionality Social Club itself does not yet offer:
 
-- **Quick-add Users**: Allows you to send friend request to entered Social Club IDs instantly.
-- **Delete All Friends**: Allows you to remove ALL friends instantly.
-- **Reject All Friend Requests**: Allows you to reject ALL friend requests instantly.
-- **Delete All Messages**: Allows you to remove ALL received and sent messages instantly.
+- **Quick-add Users**: Allows you to send friend request to entered Social Club IDs with one click.
+- **Delete All Friends**: Allows you to remove ALL friends with one click.
+- **Reject All Friend Requests**: Allows you to reject ALL friend requests with one click.
+- **Delete All Messages**: Allows you to remove ALL received and sent messages with one click.
+
+Note that due to rate limiting the process may take a while, it is fully automated though!
 
 ## Usage
 To use, add the following as the URL of a bookmark, then click it!
